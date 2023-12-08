@@ -3,7 +3,7 @@ from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy.orm import validates
 from sqlalchemy.ext.associationproxy import association_proxy  # Add this import
 from config import db
-from MenuDish import menu_dish
+from menudish import MenuDish
 
 class Dish(db.Model, SerializerMixin):
     __tablename__ = 'dishes'
