@@ -7,6 +7,7 @@ from flask_migrate import Migrate
 from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
+from flask_oauthlib.client import OAuth
 
 # Local imports
 
@@ -29,3 +30,27 @@ api = Api(app)
 
 # Instantiate CORS
 CORS(app)
+
+OAUTHLIB_DEBUG = True
+
+app.config['OAUTH_CREDENTIALS'] = {
+    'google': {
+        'id': 'YOUR_GOOGLE_CLIENT_ID',
+        'secret': 'YOUR_GOOGLE_CLIENT_SECRET'
+    }
+}
+
+oauth = OAuth(app)
+google = oauth.remote_app(
+    'google',
+    consumer_key=app.config.get('OAUTH_CREDENTIALS')['google']['id'],
+    consumer_secret=app.config.get('OAUTH_CREDENTIALS')['google']['secret'],
+    request_token_params={
+        'scope': 'email',
+    },
+    base_url='https://www.googleapis.com/oauth2/v1/',
+    request_token_url=None,
+    access_token_method='POST',
+    access_token_url='https://accounts.google.com/o/oauth2/token',
+    authorize_url='https://accounts.google.com/o/oauth2/auth',
+)
