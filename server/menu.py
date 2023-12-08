@@ -1,5 +1,7 @@
+# menu.py
 from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy.orm import validates
+from sqlalchemy.ext.associationproxy import association_proxy
 from config import db
 from MenuDish import menu_dish
 
@@ -8,12 +10,13 @@ class Menu(db.Model, SerializerMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
-    # Add other fields as needed
 
     # relationships
     restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurants.id'), nullable=False)
     restaurant = db.relationship('Restaurant', back_populates='menus')
-    dishes = db.relationship('Dish', secondary=menu_dish, back_populates='menus')
+    menu_dish_associations = db.relationship('MenuDish', back_populates='menu', cascade='all, delete-orphan')
+    dishes = association_proxy('menu_dish_associations', 'dish')  # Add association_proxy
+
     reviews = db.relationship('Review', back_populates='menu', cascade='all, delete-orphan')
 
     # serialization

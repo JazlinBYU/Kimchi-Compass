@@ -1,69 +1,210 @@
-from flask import Flask, redirect, url_for, session
-from flask_oauthlib.client import OAuth
-from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
-from config import app, db, oauth
+#!/usr/bin/env python3
 
-login_manager = LoginManager(app)
-login_manager.login_view = 'login'
+from flask import request, session, Flask, jsonify
+from flask_restful import Api, Resource
+from werkzeug.exceptions import NotFound
+from config import app, db
 
-# OAuth Configuration
-google = oauth.remote_app(
-    'google',
-    consumer_key=app.config.get('OAUTH_CREDENTIALS')['google']['id'],
-    consumer_secret=app.config.get('OAUTH_CREDENTIALS')['google']['secret'],
-    request_token_params={
-        'scope': 'email',
-    },
-    base_url='https://www.googleapis.com/oauth2/v1/',
-    request_token_url=None,
-    access_token_method='POST',
-    access_token_url='https://accounts.google.com/o/oauth2/token',
-    authorize_url='https://accounts.google.com/o/oauth2/auth',
-)
+# Import your model files
+from user import User
+from restaurant import Restaurant
+from menu import Menu
+from dish import Dish
+from menu_dish import MenuDish
+from review import Review
 
-class User(UserMixin):
-    def __init__(self, user_id):
-        self.id = user_id
+api = Api(app)
 
-# Routes
+@app.errorhandler(NotFound)
+def handle_404(error):
+    response = {"message": error.description}
+    return response, error.code
+
 @app.route('/')
 def index():
-    return 'Welcome to your app!'
+    return '<h1>Project Server</h1>'
 
-@app.route('/login')
-def login():
-    return google.authorize(callback=url_for('authorized', _external=True))
+# Define your resource classes
 
-@app.route('/logout')
-@login_required
-def logout():
-    logout_user()
-    return redirect(url_for('index'))
+class Users(Resource):
+    def get(self):
+        users = [user.to_dict() for user in User.query.all()]
+        return users, 200
+    
+    def post(self):
+        try:
+            data = request.get_json()
+            new_user = User(
+                username=data.get('username'),
+                email=data.get('email')
+            )
+            new_user.password_hash = data.get('password')
+            db.session.add(new_user)
+            db.session.commit()
+            return new_user.to_dict(), 201
+        except Exception as e:
+            db.session.rollback()
+            return {'message': str(e)}, 400
 
-@app.route('/login/authorized')
-def authorized():
-    resp = google.authorized_response()
-    if resp is None:
-        return 'Access denied: reason=%s error=%s' % (
-            request.args['error_reason'],
-            request.args['error_description']
-        )
-    session['oauth_token'] = (resp['access_token'], '')
-    me = google.get('userinfo')
-    user = User(me.data['id'])
-    login_user(user)
-    return redirect(url_for('index'))
+    def put(self, id):
+        try:
+            data = request.get_json()
+            user = User.query.get_or_404(id, description=f"User {id} not found")
 
-@google.tokengetter
-def get_google_oauth_token():
-    return session.get('google_token')
+            # Update user information
+            user.username = data.get('username', user.username)
+            user.email = data.get('email', user.email)
+            user.password_hash = data.get('password', user.password_hash)
 
-# Sample protected route
-@app.route('/profile')
-@login_required
-def dashboard():
-    return f'Hello, {current_user.username}! This is your profile.'
+            db.session.commit()
+            return user.to_dict(), 200
+        except Exception as e:
+            db.session.rollback()
+            return {'message': str(e)}, 400
+
+    def delete(self, id):
+        try:
+            user = User.query.get_or_404(id, description=f"User {id} not found")
+
+            # Delete the user
+            db.session.delete(user)
+            db.session.commit()
+            
+            return {}, 204
+        except Exception as e:
+            db.session.rollback()
+            return {'message': str(e)}, 400
+
+    def post(self, id):
+        try:
+            data = request.get_json()
+            user = User.query.get_or_404(id, description=f"User {id} not found")
+
+            # Create a new review for the user
+            new_review = Review(
+                content=data.get('content'),
+                user_id=id,
+                restaurant_id=data.get('restaurant_id') # Adjust based on your data model
+            )
+
+            db.session.add(new_review)
+            db.session.commit()
+            return new_review.to_dict(), 201
+        except Exception as e:
+            db.session.rollback()
+            return {'message': str(e)}, 400
+
+api.add_resource(Users, "/users", "/users/<int:id>")
+
+class Restaurants(Resource):
+    def get(self):
+        restaurants = [restaurant.to_dict() for restaurant in Restaurant.query.all()]
+        return restaurants, 200
+    
+    def post(self):
+        try:
+            data = request.get_json()
+            new_restaurant = Restaurant(
+                name=data.get('name')
+            )
+            db.session.add(new_restaurant)
+            db.session.commit()
+            return new_restaurant.to_dict(), 201
+        except Exception as e:
+            db.session.rollback()
+            return {'message': str(e)}, 400
+
+api.add_resource(Restaurants, "/restaurants")
+
+# Define similar resources for Menu, Dish, MenuDish, and Review
+
+class Menus(Resource):
+    def get(self):
+        menus = [menu.to_dict() for menu in Menu.query.all()]
+        return menus, 200
+    
+    def post(self):
+        try:
+            data = request.get_json()
+            new_menu = Menu(
+                name=data.get('name'),
+                restaurant_id=data.get('restaurant_id') # Make sure to adjust based on your data model
+            )
+            db.session.add(new_menu)
+            db.session.commit()
+            return new_menu.to_dict(), 201
+        except Exception as e:
+            db.session.rollback()
+            return {'message': str(e)}, 400
+
+api.add_resource(Menus, "/menus")
+
+class Dishes(Resource):
+    def get(self):
+        dishes = [dish.to_dict() for dish in Dish.query.all()]
+        return dishes, 200
+    
+    def post(self):
+        try:
+            data = request.get_json()
+            new_dish = Dish(
+                name=data.get('name'),
+                description=data.get('description'),
+                price=data.get('price')
+            )
+            db.session.add(new_dish)
+            db.session.commit()
+            return new_dish.to_dict(), 201
+        except Exception as e:
+            db.session.rollback()
+            return {'message': str(e)}, 400
+
+api.add_resource(Dishes, "/dishes")
+
+# Define similar resources for MenuDish and Review
+
+class MenuDishes(Resource):
+    def get(self):
+        menu_dishes = [menu_dish.to_dict() for menu_dish in MenuDish.query.all()]
+        return menu_dishes, 200
+    
+    def post(self):
+        try:
+            data = request.get_json()
+            new_menu_dish = MenuDish(
+                menu_id=data.get('menu_id'),
+                dish_id=data.get('dish_id')
+            )
+            db.session.add(new_menu_dish)
+            db.session.commit()
+            return new_menu_dish.to_dict(), 201
+        except Exception as e:
+            db.session.rollback()
+            return {'message': str(e)}, 400
+
+api.add_resource(MenuDishes, "/menu_dishes")
+
+class Reviews(Resource):
+    def get(self):
+        reviews = [review.to_dict() for review in Review.query.all()]
+        return reviews, 200
+    
+    def post(self):
+        try:
+            data = request.get_json()
+            new_review = Review(
+                content=data.get('content'),
+                user_id=data.get('user_id'),
+                restaurant_id=data.get('restaurant_id') # Make sure to adjust based on your data model
+            )
+            db.session.add(new_review)
+            db.session.commit()
+            return new_review.to_dict(), 201
+        except Exception as e:
+            db.session.rollback()
+            return {'message': str(e)}, 400
+
+api.add_resource(Reviews, "/reviews")
 
 if __name__ == '__main__':
-    db.create_all()
     app.run(debug=True)
