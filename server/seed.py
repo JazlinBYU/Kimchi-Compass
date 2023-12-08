@@ -1,22 +1,20 @@
 import requests
-from config import db, app
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from app import Restaurant, db  # Assuming your main app file is named app.py
 from restaurant import Restaurant
-from fake_data import populate_data
+
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
+db = SQLAlchemy(app)
 
 YELP_API_KEY = "nS0hSkt6MykfzvtTOX0nD8MexHqE5NYlAlaZUj6_r9_Uz6E-XTAypJc_N10lkzWj1wb2ZJ3QTsQH-x1u8SYFpxvzwpKGo2H01US8j-s-7_Bg_Y-OdhmyHWKKLAVzZXYx"
-
-
-def clear_tables():
-    db.drop_all()
-    db.create_all()
-    print("Database created!")
-
 
 def get_yelp_data():
     params = {
         'location': 'Seattle',
         'categories': 'restaurants',
-        'limit': 10 # Adjust based on your needs
+        'limit': 10  # Adjust based on your needs
     }
 
     headers = {
@@ -26,29 +24,22 @@ def get_yelp_data():
     response = requests.get('https://api.yelp.com/v3/businesses/search', params=params, headers=headers)
     return response.json().get('businesses', [])
 
-
 def seed_database():
     restaurant_data = get_yelp_data()
 
     for data in restaurant_data:
         # Extract relevant data from the Yelp API response
         name = data.get('name')
-        rating = data.get('rating')
-        price = data.get('price')
-        # Extract other fields as needed
 
         # Create a new Restaurant instance and add it to the database
-        restaurant = Restaurant(name=name, rating=rating, price=price)
-        # Set other fields as needed
-
+        restaurant = Restaurant(name=name)
         db.session.add(restaurant)
 
     # Commit the changes to the database
     db.session.commit()
 
-
 if __name__ == '__main__':
     with app.app_context():
-        # Run the seed script
-        clear_tables()
+        db.create_all()
+        print("Database created!")
         seed_database()

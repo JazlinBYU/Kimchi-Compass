@@ -3,7 +3,7 @@ from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy.orm import validates
 from sqlalchemy.ext.associationproxy import association_proxy  # Add this import
 from config import db
-from menudish import MenuDish
+
 
 class Dish(db.Model, SerializerMixin):
     __tablename__ = 'dishes'
@@ -11,11 +11,12 @@ class Dish(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
     description = db.Column(db.String(500))
+    menu_id = db.Column(db.Integer, db.ForeignKey('menus.id'))
     price = db.Column(db.Float)
 
     # relationships
-    menu_dish_associations = db.relationship('MenuDish', back_populates='dish', cascade='all, delete-orphan')
-    menus = association_proxy('menu_dish_associations', 'menu')  # Add association_proxy
+    menu = db.relationship('Menu', back_populates='menu_dish', cascade='all, delete-orphan')
+    menus = association_proxy('menu_dish', 'menu')  # Add association_proxy
 
     @validates('name')
     def validate_name(self, key, name):
