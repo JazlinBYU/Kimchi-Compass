@@ -10,17 +10,15 @@ class Menu(db.Model, SerializerMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
-
+    
     # relationships
+    # restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurants.id'), nullable=False)
+    # restaurant = db.relationship('Restaurant', back_populates='menus')
     restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurants.id'), nullable=False)
     restaurant = db.relationship('Restaurant', back_populates='menus')
-    menu_dish = db.relationship('Dish', back_populates='menu', cascade='all, delete-orphan')
-    dishes = association_proxy('menu_dish', 'dish')  # Add association_proxy
-
-    reviews = db.relationship('Review', back_populates='menu', cascade='all, delete-orphan')
-
+    menu_dishes = db.relationship('MenuDish', back_populates='menu')
     # serialization
-    serialize_only = ("id", "name", "restaurant_id", "dishes", "reviews")
+    serialize_only = ("id", "name", "restaurant_id", "dishes", "menu_dishes")
 
     def __repr__(self):
         return f"<Menu {self.id}: {self.name}>"
@@ -34,4 +32,10 @@ class Menu(db.Model, SerializerMixin):
             raise ValueError("Name must be at least 1 character")
         return name
 
-    # Add more validations as needed
+    @validates('restaurant_id')
+    def validate_restaurant_id(self, key, restaurant_id):
+        if restaurant_id <= 0:
+            raise ValueError("Invalid restaurant ID")
+        return restaurant_id
+
+

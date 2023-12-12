@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 
-from flask import request, session, Flask, jsonify
+from flask import request, session, Flask, jsonify, url_for, redirect
 from flask_restful import Api, Resource
 from werkzeug.exceptions import NotFound
+from authlib.integrations.flask_client import OAuth
+from flask_login import LoginManager, login_user, logout_user, current_user
 from config import app, db
 
 # Import your model files
@@ -12,17 +14,65 @@ from menu import Menu
 from dish import Dish
 from menu_dish import MenuDish
 from review import Review
+from favorite import Favorite
+
+# Initialize OAuth and Flask-Login
+oauth = OAuth(app)
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+# OAuth Configuration for Google
+google = oauth.register(
+    name='google',
+    client_id='9656575814-i0rc5aehtlvhkv8fu23gnmgrtnspf5ps.apps.googleusercontent.com',
+    client_secret='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',
+    access_token_url='https://accounts.google.com/o/oauth2/token',
+    authorize_url='https://accounts.google.com/o/oauth2/auth',
+    api_base_url='https://www.googleapis.com/oauth2/v1/',
+    client_kwargs={'scope': 'openid email profile'},
+)
 
 api = Api(app)
+
+@app.route('/')
+def index():
+    return '<h1>Project Server</h1>'
 
 @app.errorhandler(NotFound)
 def handle_404(error):
     response = {"message": error.description}
     return response, error.code
 
-@app.route('/')
-def index():
-    return '<h1>Project Server</h1>'
+# Google OAuth routes
+@app.route('/login/google')
+def google_login():
+    redirect_uri = url_for('authorize', _external=True)
+    return google.authorize_redirect(redirect_uri)
+
+@app.route('/authorize')
+def authorize():
+    token = google.authorize_access_token()
+    resp = google.get('userinfo')
+    user_info = resp.json()
+    user = User.query.filter_by(email=user_info['email']).first()
+
+    if not user:
+        user = User(email=user_info['email'], google_id=user_info['sub'])
+        db.session.add(user)
+        db.session.commit()
+
+    login_user(user)
+    return redirect('/')
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect('/')
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
 
 # Define your resource classes
 
@@ -205,6 +255,36 @@ class Reviews(Resource):
             return {'message': str(e)}, 400
 
 api.add_resource(Reviews, "/reviews")
+
+class Favorites(Resource):
+    def get(self):
+        favorites = [favorite.to_dict() for favorite in Favorite.query.all()]
+        return favorites, 200
+    
+    def post(self):
+        try:
+            data = request.get_json()
+            new_favorite = Favorite(
+                user_id=data.get('user_id'),
+                restaurant_id=data.get('restaurant_id')
+            )
+            db.session.add(new_favorite)
+            db.session.commit()
+            return new_favorite.to_dict(), 201
+        except Exception as e:
+            db.session.rollback()
+            return {'message': str(e)}, 400
+
+api.add_resource(Favorites, "/favorites")
+
+@app.errorhandler(400)
+def handle_400(error):
+    return {"message": "Bad Request"}, 400
+
+@app.errorhandler(500)
+def handle_500(error):
+    return {"message": "Internal Server Error"}, 500
+
 
 if __name__ == '__main__':
     app.run(debug=True)
