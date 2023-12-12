@@ -38,6 +38,12 @@ api = Api(app)
 def index():
     return '<h1>Project Server</h1>'
 
+def handle_exception(e):
+    response = e.get_response()
+    response.data = jsonify({"message": e.description})
+    response.content_type = "application/json"
+    return response
+
 @app.errorhandler(NotFound)
 def handle_404(error):
     response = {"message": error.description}
@@ -75,6 +81,56 @@ def load_user(user_id):
 
 
 # Define your resource classes
+
+class UserResource(Resource):
+    def get(self, id):
+        user = User.query.get_or_404(id)
+        return jsonify(user.to_dict())
+
+    def put(self, id):
+        user = User.query.get_or_404(id)
+        data = request.get_json()
+        user.username = data.get('username', user.username)
+        user.email = data.get('email', user.email)
+        # Handle password update if needed
+        db.session.commit()
+        return jsonify(user.to_dict())
+
+    def delete(self, id):
+        user = User.query.get_or_404(id)
+        db.session.delete(user)
+        db.session.commit()
+        return '', 204
+
+class UserList(Resource):
+    def get(self):
+        users = User.query.all()
+        return jsonify([user.to_dict() for user in users])
+
+    def post(self):
+        data = request.get_json()
+        new_user = User(username=data['username'], email=data['email'])
+        new_user.password_hash = data.get('password')
+        db.session.add(new_user)
+        db.session.commit()
+        return jsonify(new_user.to_dict()), 201
+
+api.add_resource(UserResource, '/users/<int:id>')
+api.add_resource(UserList, '/users')
+
+class RestaurantResource(Resource):
+    def get(self):
+        restaurants = Restaurant.query.all()
+        return jsonify([restaurant.to_dict() for restaurant in restaurants])
+
+    def post(self):
+        data = request.get_json()
+        new_restaurant = Restaurant(name=data['name'])
+        db.session.add(new_restaurant)
+        db.session.commit()
+        return jsonify(new_restaurant.to_dict()), 201
+
+api.add_resource(RestaurantResource, '/restaurants')
 
 class Users(Resource):
     def get(self):
