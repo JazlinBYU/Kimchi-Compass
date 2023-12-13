@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import { SnackbarProvider } from "notistack";
 import { UserProvider } from "./UserContext";
 import Home from "./components/Home";
@@ -14,19 +14,16 @@ function App() {
       <SnackbarProvider maxSnack={3}>
         {" "}
         {/* Wrap with SnackbarProvider */}
-        <Router>
-          <div>
-            {/* Navigation Bar and other shared components */}
-
-            <Switch>
-              <Route path="/" exact component={Home} />
-              <Route path="/sign-up" component={SignUp} />
-              <Route path="/restaurants/:id" component={RestaurantDetails} />
-              <Route path="/profile" component={UserProfile} />
-              <Route path="/add-restaurant" component={AddRestaurantForm} />
-            </Switch>
-          </div>
-        </Router>
+        <div>
+          {/* Navigation Bar and other shared components */}
+          <Routes>
+            <Route path="/" exact element={<Home />} />
+            <Route path="/register" component={SignUp} />
+            <Route path="/restaurants/:id" component={RestaurantDetails} />
+            <Route path="/profile" component={UserProfile} />
+            <Route path="/add-restaurant" component={AddRestaurantForm} />
+          </Routes>
+        </div>
       </SnackbarProvider>
     </UserProvider>
   );

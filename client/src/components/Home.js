@@ -5,17 +5,17 @@ import SearchFilter from "./SearchFilter";
 import { debounce } from "lodash"; // Ensure lodash is installed
 
 const Home = () => {
-  const { enqueueSnackbar } = useSnackbar();
   const [restaurants, setRestaurants] = useState([]);
   const [filteredRestaurants, setFilteredRestaurants] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
     const fetchRestaurants = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch("/api/restaurants"); // Adjust the API endpoint as necessary
+        const response = await fetch("/restaurants"); // Adjust the API endpoint as necessary
         if (!response.ok) {
           throw new Error("Failed to fetch restaurants");
         }
