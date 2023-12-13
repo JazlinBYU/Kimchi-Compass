@@ -1,44 +1,73 @@
 import React, { useState, useEffect } from "react";
+import { useSnackbar } from "notistack";
 import RestaurantCard from "./RestaurantCard";
 import SearchFilter from "./SearchFilter";
+import { debounce } from "lodash"; // Ensure lodash is installed
 
 const Home = () => {
+  const { enqueueSnackbar } = useSnackbar();
   const [restaurants, setRestaurants] = useState([]);
+  const [filteredRestaurants, setFilteredRestaurants] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // Example fetch function
     const fetchRestaurants = async () => {
       try {
+        setIsLoading(true);
         const response = await fetch("/api/restaurants"); // Adjust the API endpoint as necessary
+        if (!response.ok) {
+          throw new Error("Failed to fetch restaurants");
+        }
         const data = await response.json();
         setRestaurants(data);
+        setFilteredRestaurants(data); // Initialize filteredRestaurants
       } catch (error) {
-        console.error("Error fetching restaurants:", error);
-        // Handle error appropriately in your application
+        enqueueSnackbar(`Error: ${error.message}`, { variant: "error" });
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchRestaurants();
-  }, []);
+  }, [enqueueSnackbar]);
+
+  useEffect(() => {
+    const debouncedSearch = debounce(() => {
+      const filtered = restaurants.filter((restaurant) =>
+        restaurant.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredRestaurants(filtered);
+    }, 300);
+
+    if (searchTerm) {
+      debouncedSearch();
+    } else {
+      setFilteredRestaurants(restaurants);
+    }
+
+    return () => {
+      debouncedSearch.cancel();
+    };
+  }, [searchTerm, restaurants]);
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
   };
 
-  const filteredRestaurants = searchTerm
-    ? restaurants.filter((restaurant) =>
-        restaurant.name.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    : restaurants;
-
   return (
     <div>
       <SearchFilter value={searchTerm} onChange={handleSearchChange} />
       <div className="restaurant-list">
-        {filteredRestaurants.map((restaurant) => (
-          <RestaurantCard key={restaurant.id} restaurant={restaurant} />
-        ))}
+        {isLoading ? (
+          <p>Loading restaurants...</p>
+        ) : filteredRestaurants.length > 0 ? (
+          filteredRestaurants.map((restaurant) => (
+            <RestaurantCard key={restaurant.id} restaurant={restaurant} />
+          ))
+        ) : (
+          <p>No restaurants found.</p>
+        )}
       </div>
     </div>
   );

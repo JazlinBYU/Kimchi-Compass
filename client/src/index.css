@@ -5,3 +5,20 @@
   --text: hsla(0, 0%, 100%, 0.88);
 }
 
+.restaurant-card {
+  border: 1px solid #ddd;
+  padding: 15px;
+  margin: 10px 0;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.restaurant-card img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.restaurant-card h3 {
+  margin: 10px 0;
+}

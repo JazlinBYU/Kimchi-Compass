@@ -1,8 +1,20 @@
 import React from "react";
-import App from "./components/App";
-import "./index.css";
-import { createRoot } from "react-dom/client";
+import ReactDOM from "react-dom/client"; // Import from 'react-dom/client'
+import App from "./App";
+import { BrowserRouter } from "react-router-dom";
+import { UserProvider } from "./UserContext";
+import { SnackbarProvider } from "notistack";
 
-const container = document.getElementById("root");
-const root = createRoot(container);
-root.render(<App />);
+// Use createRoot to render the application
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(
+  <React.StrictMode>
+    <UserProvider>
+      <SnackbarProvider maxSnack={3}>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </SnackbarProvider>
+    </UserProvider>
+  </React.StrictMode>
+);

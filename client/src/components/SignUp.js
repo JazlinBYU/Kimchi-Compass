@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import OAuthSignIn from "./OAuthSignIn"; // Assuming this component handles OAuth
+import { UserContext } from "../UserContext"; // Adjust the path as necessary
 
 const SignUp = () => {
+  const { setUser } = useContext(UserContext); // Using UserContext
+
   // Validation Schema for Sign Up
   const signUpValidationSchema = Yup.object().shape({
     email: Yup.string().email("Invalid email").required("Email is required"),
@@ -17,12 +19,50 @@ const SignUp = () => {
     password: Yup.string().required("Password is required"),
   });
 
-  const handleSignUpSubmit = (values) => {
-    // Handle sign-up submit
+  const handleOAuthSignIn = (provider) => {
+    window.location.href = `/api/auth/${provider}`;
   };
 
-  const handleSignInSubmit = (values) => {
-    // Handle sign-in submit
+  const handleSignUpSubmit = async (values) => {
+    try {
+      const response = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
+
+      if (response.ok) {
+        // Assuming the response contains the user data
+        const userData = await response.json();
+        setUser(userData); // Update user context
+        // Redirect or additional logic
+      } else {
+        // Handle errors
+      }
+    } catch (error) {
+      // Handle network errors
+    }
+  };
+
+  const handleSignInSubmit = async (values) => {
+    try {
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
+
+      if (response.ok) {
+        // Assuming the response contains the user data
+        const userData = await response.json();
+        setUser(userData); // Update user context
+        // Redirect or additional logic
+      } else {
+        // Handle errors
+      }
+    } catch (error) {
+      // Handle network errors
+    }
   };
 
   return (
@@ -61,7 +101,8 @@ const SignUp = () => {
           )}
         </Formik>
       </div>
-      <OAuthSignIn />
+      <h2>Or Sign In with</h2>
+      <button onClick={() => handleOAuthSignIn("google")}>Google</button>
     </div>
   );
 };
