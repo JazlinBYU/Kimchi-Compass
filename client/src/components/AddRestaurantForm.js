@@ -48,7 +48,45 @@ const AddRestaurantForm = () => {
     }
   };
 
-  return <Formik /* ... */>{/* Your form fields */}</Formik>;
+  return (
+    <Formik
+      initialValues={initialValues}
+      validationSchema={validationSchema}
+      onSubmit={handleSubmit}>
+      {({ isSubmitting }) => (
+        <Form>
+          <div>
+            <label htmlFor="name">Name:</label>
+            <Field type="text" name="name" />
+            <ErrorMessage name="name" component="div" />
+          </div>
+          <div>
+            <label htmlFor="rating">Rating:</label>
+            <Field type="number" name="rating" />
+            <ErrorMessage name="rating" component="div" />
+          </div>
+          <div>
+            <label htmlFor="image_url">Image URL:</label>
+            <Field type="text" name="image_url" />
+            <ErrorMessage name="image_url" component="div" />
+          </div>
+          <div>
+            <label htmlFor="phone_number">Phone Number:</label>
+            <Field type="text" name="phone_number" />
+            <ErrorMessage name="phone_number" component="div" />
+          </div>
+          <div>
+            <label htmlFor="address">Address:</label>
+            <Field type="text" name="address" />
+            <ErrorMessage name="address" component="div" />
+          </div>
+          <button type="submit" disabled={isSubmitting}>
+            Add Restaurant
+          </button>
+        </Form>
+      )}
+    </Formik>
+  );
 };
 
 export default AddRestaurantForm;
