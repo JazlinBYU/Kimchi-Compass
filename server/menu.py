@@ -12,12 +12,13 @@ class Menu(db.Model, SerializerMixin):
     name = db.Column(db.String, nullable=False)
     
     # relationships
-
+    # restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurants.id'), nullable=False)
+    # restaurant = db.relationship('Restaurant', back_populates='menus')
     restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurants.id'), nullable=False)
     restaurant = db.relationship('Restaurant', back_populates='menus')
-    menu_dishes = db.relationship('MenuDish', back_populates='menus')
+    menu_dishes = db.relationship('MenuDish', back_populates='menu')
     # serialization
-    serialize_only = ("id", "name", "restaurant_id", "menu_dishes")
+    serialize_only = ("id", "name", "restaurant_id", "dishes", "menu_dishes")
 
     def __repr__(self):
         return f"<Menu {self.id}: {self.name}>"

@@ -20,12 +20,12 @@ const SignUp = () => {
   });
 
   const handleOAuthSignIn = (provider) => {
-    window.location.href = `/api/auth/${provider}`;
+    window.location.href = `/auth/${provider}`;
   };
 
   const handleSignUpSubmit = async (values) => {
     try {
-      const response = await fetch("/api/register", {
+      const response = await fetch("/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),
@@ -46,7 +46,7 @@ const SignUp = () => {
 
   const handleSignInSubmit = async (values) => {
     try {
-      const response = await fetch("/api/login", {
+      const response = await fetch("/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),

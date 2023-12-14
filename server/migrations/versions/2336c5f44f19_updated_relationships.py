@@ -1,8 +1,8 @@
-"""<descriptive message>
+"""Updated relationships
 
-Revision ID: f7021330fda2
+Revision ID: 2336c5f44f19
 Revises: 
-Create Date: 2023-12-12 01:45:52.106065
+Create Date: 2023-12-13 20:39:16.310420
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'f7021330fda2'
+revision = '2336c5f44f19'
 down_revision = None
 branch_labels = None
 depends_on = None
