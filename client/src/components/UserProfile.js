@@ -1,24 +1,70 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { UserContext } from "../UserContext";
+import RestaurantCard from "./RestaurantCard"; // Adjust import path as needed
 
 const UserProfile = () => {
-  const { currentUser, isLoading } = useContext(UserContext);
+  const { currentUser, logout } = useContext(UserContext);
+  const [userInfo, setUserInfo] = useState({});
+  const navigate = useNavigate();
 
-  if (isLoading) {
-    return <p>Loading profile...</p>;
-  }
+  useEffect(() => {
+    if (currentUser) {
+      // Replace '/users/:id' with your actual endpoint to fetch user data including favorites
+      fetch(`/users/${currentUser.id}`)
+        .then((response) => {
+          if (response.ok) {
+            response.json().then(setUserInfo);
+          } else {
+            // Handle errors
+          }
+        })
+        .catch((error) => {
+          // Handle network error
+        });
+    }
+  }, [currentUser]);
+
+  const deleteProfile = () => {
+    if (!currentUser) {
+      return;
+    }
+
+    // Replace '/users/:id' with your actual endpoint for user deletion
+    fetch(`/users/${currentUser.id}`, { method: "DELETE" })
+      .then((response) => {
+        if (response.ok) {
+          logout();
+          navigate("/");
+        } else {
+        }
+      })
+      .catch((error) => {});
+  };
+
+  const favoriteRestaurants = userInfo.favorites?.map((favorite) => (
+    <RestaurantCard key={favorite.id} {...favorite.restaurant} />
+  ));
 
   return (
     <div>
-      {currentUser ? (
-        <div>
-          <h1>{currentUser.username}</h1>
-          <p>Email: {currentUser.email}</p>
-          {/* Display other user profile details */}
-        </div>
-      ) : (
-        <p>User profile not found.</p>
+      {currentUser && (
+        <>
+          <div className="main">
+            <h2>{userInfo.username}'s Profile</h2>
+            <p>Username: {userInfo.username}</p>
+            <p>Email: {userInfo.email}</p>
+
+            <div className="buttons">
+              <Link to="/profile/edit">
+                <button>Edit Profile</button>
+              </Link>
+              <button onClick={deleteProfile}>Delete Profile</button>
+            </div>
+          </div>
+        </>
       )}
+      <div className="container">{favoriteRestaurants}</div>
     </div>
   );
 };

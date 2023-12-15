@@ -9,14 +9,12 @@ class Favorite(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurants.id'), nullable=True)
-    dish_id = db.Column(db.Integer, db.ForeignKey('dishes.id'), nullable=True)
 
     # Relationships
     user = db.relationship('User', back_populates='favorites')
     restaurant = db.relationship('Restaurant', back_populates='favorites')
-    dish = db.relationship('Dish', back_populates='favorites')
 
-    serialize_only = ("id", "user_id", "restaurant_id", "dish_id")
+    serialize_only = ("id", "user_id", "restaurant_id")
 
     def __repr__(self):
         return f"<Favorite {self.id}: User {self.user_id} - Restaurant {self.restaurant_id} - Dish {self.dish_id}>"

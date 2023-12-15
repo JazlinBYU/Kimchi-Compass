@@ -1,54 +1,47 @@
 import React, { useState, useEffect } from "react";
-import { useSnackbar } from "notistack";
 import RestaurantCard from "./RestaurantCard";
 import SearchFilter from "./SearchFilter";
-import { debounce } from "lodash"; // Ensure lodash is installed
 
 const Home = () => {
   const [restaurants, setRestaurants] = useState([]);
   const [filteredRestaurants, setFilteredRestaurants] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [alertMessage, setAlertMessage] = useState(""); // Local state for alert messages
   const [isLoading, setIsLoading] = useState(false);
-  const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
     const fetchRestaurants = async () => {
+      setIsLoading(true);
       try {
-        setIsLoading(true);
-        const response = await fetch("/restaurants"); // Adjust the API endpoint as necessary
+        const response = await fetch("/restaurants");
         if (!response.ok) {
-          throw new Error("Failed to fetch restaurants");
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const data = await response.json();
-        setRestaurants(data);
-        setFilteredRestaurants(data); // Initialize filteredRestaurants
+        if (
+          response.headers.get("content-type")?.includes("application/json")
+        ) {
+          const data = await response.json();
+          setRestaurants(data);
+          setFilteredRestaurants(data);
+        } else {
+          throw new Error("Response not JSON");
+        }
       } catch (error) {
-        enqueueSnackbar(`Error: ${error.message}`, { variant: "error" });
+        setAlertMessage(error.message); // Update alert message state
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchRestaurants();
-  }, [enqueueSnackbar]);
+  }, []);
 
   useEffect(() => {
-    const debouncedSearch = debounce(() => {
-      const filtered = restaurants.filter((restaurant) =>
+    setFilteredRestaurants(
+      restaurants.filter((restaurant) =>
         restaurant.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      setFilteredRestaurants(filtered);
-    }, 300);
-
-    if (searchTerm) {
-      debouncedSearch();
-    } else {
-      setFilteredRestaurants(restaurants);
-    }
-
-    return () => {
-      debouncedSearch.cancel();
-    };
+      )
+    );
   }, [searchTerm, restaurants]);
 
   const handleSearchChange = (e) => {
@@ -57,6 +50,8 @@ const Home = () => {
 
   return (
     <div>
+      {alertMessage && <p className="alert">{alertMessage}</p>}{" "}
+      {/* Display alert messages */}
       <SearchFilter value={searchTerm} onChange={handleSearchChange} />
       <div className="restaurant-list">
         {isLoading ? (

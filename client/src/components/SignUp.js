@@ -1,106 +1,103 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { UserContext } from "../UserContext"; // Adjust the path as necessary
+import { useSnackbar } from "notistack";
+import { UserContext } from "../UserContext";
 
 const SignUp = () => {
-  const { setUser } = useContext(UserContext); // Using UserContext
+  const { setUser } = useContext(UserContext);
+  const [formType, setFormType] = useState("signIn");
+  const { enqueueSnackbar } = useSnackbar();
 
-  // Validation Schema for Sign Up
-  const signUpValidationSchema = Yup.object().shape({
+  const initialValues = {
+    email: "",
+    username: "",
+    password: "",
+  };
+
+  const validationSchema = Yup.object({
     email: Yup.string().email("Invalid email").required("Email is required"),
+    username: Yup.string().when("formType", {
+      is: "signUp",
+      then: Yup.string().required("Username is required"),
+    }),
     password: Yup.string().required("Password is required"),
-    // Additional fields like 'confirmPassword' etc.
   });
 
-  // Validation Schema for Sign In
-  const signInValidationSchema = Yup.object().shape({
-    email: Yup.string().email("Invalid email").required("Email is required"),
-    password: Yup.string().required("Password is required"),
-  });
+  const handleSubmit = async (values, { setErrors }) => {
+    const endpoint =
+      formType === "signIn"
+        ? "http://localhost:5555/login"
+        : "http://localhost:5555/users";
+
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
+
+      const responseData = await response.json();
+
+      if (response.ok) {
+        setUser(responseData);
+        enqueueSnackbar(
+          formType === "signIn" ? "Sign in successful" : "Sign up successful",
+          { variant: "success" }
+        );
+      } else {
+        setErrors(responseData.errors);
+        enqueueSnackbar("Error during sign up/in", { variant: "error" });
+      }
+    } catch (error) {
+      console.error("Network error:", error);
+      setErrors({ network: "A network error occurred." });
+      enqueueSnackbar("Network error", { variant: "error" });
+    }
+  };
 
   const handleOAuthSignIn = (provider) => {
-    window.location.href = `/auth/${provider}`;
-  };
-
-  const handleSignUpSubmit = async (values) => {
-    try {
-      const response = await fetch("/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
-      });
-
-      if (response.ok) {
-        // Assuming the response contains the user data
-        const userData = await response.json();
-        setUser(userData); // Update user context
-        // Redirect or additional logic
-      } else {
-        // Handle errors
-      }
-    } catch (error) {
-      // Handle network errors
-    }
-  };
-
-  const handleSignInSubmit = async (values) => {
-    try {
-      const response = await fetch("/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
-      });
-
-      if (response.ok) {
-        // Assuming the response contains the user data
-        const userData = await response.json();
-        setUser(userData); // Update user context
-        // Redirect or additional logic
-      } else {
-        // Handle errors
-      }
-    } catch (error) {
-      // Handle network errors
-    }
+    const oauthWindow = window.open(`/auth/${provider}`, "_blank");
+    oauthWindow.focus();
   };
 
   return (
     <div>
-      <div>
-        <h2>Sign Up</h2>
-        <Formik
-          initialValues={{ email: "", password: "" }}
-          validationSchema={signUpValidationSchema}
-          onSubmit={handleSignUpSubmit}>
-          {() => (
-            <Form>
-              <Field type="email" name="email" placeholder="Email" />
-              <ErrorMessage name="email" component="div" />
-              <Field type="password" name="password" placeholder="Password" />
-              <ErrorMessage name="password" component="div" />
-              <button type="submit">Sign Up</button>
-            </Form>
-          )}
-        </Formik>
-      </div>
-      <div>
-        <h2>Sign In</h2>
-        <Formik
-          initialValues={{ email: "", password: "" }}
-          validationSchema={signInValidationSchema}
-          onSubmit={handleSignInSubmit}>
-          {() => (
-            <Form>
-              <Field type="email" name="email" placeholder="Email" />
-              <ErrorMessage name="email" component="div" />
-              <Field type="password" name="password" placeholder="Password" />
-              <ErrorMessage name="password" component="div" />
-              <button type="submit">Sign In</button>
-            </Form>
-          )}
-        </Formik>
-      </div>
+      <Formik
+        initialValues={initialValues}
+        validationSchema={validationSchema}
+        onSubmit={(values, actions) => handleSubmit(values, actions)}>
+        {({ values }) => (
+          <Form>
+            <Field type="email" name="email" placeholder="Email" />
+            <ErrorMessage name="email" component="div" />
+
+            {formType === "signUp" && (
+              <>
+                <Field type="text" name="username" placeholder="Username" />
+                <ErrorMessage name="username" component="div" />
+              </>
+            )}
+
+            <Field type="password" name="password" placeholder="Password" />
+            <ErrorMessage name="password" component="div" />
+
+            <div>
+              <button type="button" onClick={() => setFormType("signUp")}>
+                Sign Up
+              </button>
+              <button type="button" onClick={() => setFormType("signIn")}>
+                Sign In
+              </button>
+            </div>
+
+            <button type="submit">
+              {formType === "signUp" ? "Create Account" : "Log In"}
+            </button>
+            <ErrorMessage name="network" component="div" />
+          </Form>
+        )}
+      </Formik>
       <h2>Or Sign In with</h2>
       <button onClick={() => handleOAuthSignIn("google")}>Google</button>
     </div>

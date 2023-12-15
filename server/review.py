@@ -12,15 +12,16 @@ class Review(db.Model, SerializerMixin):
     content = db.Column(db.String, nullable=False)
     rating = db.Column(db.Float)
     review_date = db.Column(db.DateTime, default=datetime.utcnow)  # Optional date field
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False) 
+    restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurants.id'), nullable=False)
 
     # Relationships
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurants.id'), nullable=False)
+
     user = db.relationship('User', back_populates='reviews')
     restaurant = db.relationship('Restaurant', back_populates='reviews')
 
     # Serialization
-    serialize_only = ("id", "content", "rating", "user", "restaurant", "review_date")
+    serialize_only = ("id", "content", "rating", "user","-user.reviews", "restaurant","-restaurant.reviews", "review_date")
 
     def __repr__(self):
         return f"<Review {self.id}: {self.content}>"

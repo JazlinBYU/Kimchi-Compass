@@ -2,10 +2,12 @@
 from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy.orm import validates
 from sqlalchemy.ext.hybrid import hybrid_property
-from config import db, bcrypt
-from favorite import Favorite
+from flask_login import UserMixin
 
-class User(db.Model, SerializerMixin):
+
+from config import db, bcrypt
+
+class User(db.Model, SerializerMixin, UserMixin):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -21,7 +23,7 @@ class User(db.Model, SerializerMixin):
     favorites = db.relationship('Favorite', back_populates='user', cascade='all, delete-orphan')
 
     # Serialize only specific fields
-    serialize_only = ("id", "username", "email")
+    serialize_only = ("id", "username", "email", "reviews", "-reviews.user", "favorites", "-favorites.user" )
 
     @validates('username')
     def validate_username(self, key, username):
@@ -46,10 +48,12 @@ class User(db.Model, SerializerMixin):
     @password.setter
     def password(self, new_password):
         hashed_password = bcrypt.generate_password_hash(new_password).decode("utf-8")
-        self._password_hash = hashed_password
+        self.password_hash = hashed_password  # Fixed the attribute name
+
 
     def authenticate(self, password_to_check):
         # This method is not used for OAuth users
         if self.password_hash:
             return bcrypt.check_password_hash(self._password_hash, password_to_check)
         return False
+

@@ -1,10 +1,16 @@
 import requests
 from flask import Flask
+from faker import Faker
+from favorite import Favorite
+from random import randint, choice
+from datetime import datetime
+from config import db
 from restaurant import Restaurant
 from menu import Menu
 from dish import Dish
 from menu_dish import MenuDish
-from config import db
+from user import User
+from review import Review
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'  # Ensure this matches your actual database URI
@@ -32,6 +38,7 @@ def get_yelp_data():
         return []
 
 def seed_database():
+    fake = Faker()
     try:
         # Seed restaurants from Yelp data
         yelp_data = get_yelp_data()
@@ -45,6 +52,8 @@ def seed_database():
             db.session.add(restaurant)
 
         db.session.commit()
+
+        
 
         # Sample Korean dishes
         sample_dishes = [
@@ -98,6 +107,30 @@ def seed_database():
             for dish in dinner_dishes:
                 menu_dish = MenuDish(menu=dinner_menu, dish=dish)
                 db.session.add(menu_dish)
+
+                # Seed fake users
+        for _ in range(10):  # Adjust number as needed
+            user = User(
+                username=fake.user_name(),
+                email=fake.email(),
+                password_hash=fake.password()  # In reality, hash this password
+            )
+            db.session.add(user)
+
+        db.session.commit()
+
+        # Seed fake reviews
+        users = User.query.all()
+        for restaurant in restaurants:
+            for _ in range(5):  # Adjust number as needed
+                review = Review(
+                    content=fake.text(),
+                    rating=randint(1, 5),
+                    review_date=datetime.utcnow(),
+                    user_id=choice(users).id,
+                    restaurant_id=restaurant.id
+                )
+                db.session.add(review)
 
         db.session.commit()
         print("Database seeded successfully!")

@@ -17,8 +17,11 @@ class Menu(db.Model, SerializerMixin):
     restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurants.id'), nullable=False)
     restaurant = db.relationship('Restaurant', back_populates='menus')
     menu_dishes = db.relationship('MenuDish', back_populates='menu')
+    dishes = association_proxy('menu_dishes', 'dish')
+
     # serialization
-    serialize_only = ("id", "name", "restaurant_id", "dishes", "menu_dishes")
+    serialize_only = ("id", "name", "restaurant_id", "dishes","-dishes.menus", "menu_dishes", "-menu_dishes.menu")
+    
 
     def __repr__(self):
         return f"<Menu {self.id}: {self.name}>"

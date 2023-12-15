@@ -13,7 +13,6 @@ class Dish(db.Model, SerializerMixin):
 
     # Relationships
     menu_dishes = db.relationship('MenuDish', back_populates='dish')
-    favorites = db.relationship("Favorite", back_populates="dish")
 
     # Validations
     @validates('name')

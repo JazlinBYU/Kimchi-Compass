@@ -1,8 +1,8 @@
-"""Updated relationships
+"""fixing models
 
-Revision ID: 2336c5f44f19
+Revision ID: 3d9b9ec0f92e
 Revises: 
-Create Date: 2023-12-13 20:39:16.310420
+Create Date: 2023-12-14 14:12:59.379603
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '2336c5f44f19'
+revision = '3d9b9ec0f92e'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -51,8 +51,6 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('restaurant_id', sa.Integer(), nullable=True),
-    sa.Column('dish_id', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['dish_id'], ['dishes.id'], name=op.f('fk_favorites_dish_id_dishes')),
     sa.ForeignKeyConstraint(['restaurant_id'], ['restaurants.id'], name=op.f('fk_favorites_restaurant_id_restaurants')),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], name=op.f('fk_favorites_user_id_users')),
     sa.PrimaryKeyConstraint('id')
