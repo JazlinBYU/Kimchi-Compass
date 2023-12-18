@@ -63,16 +63,21 @@ api.add_resource(FoodUsers, "/food_users")
 class FoodUsersById(Resource):
     def get(self, id):
         food_user = FoodUser.query.get_or_404(id, description=f"FoodUser {id} not found")
-        return food_user.to_dict(rules=("restaurants")), 200
+        return food_user.to_dict(rules=("restaurants",)), 200
 
     def patch(self, id):
         food_user = FoodUser.query.get_or_404(id, description=f"FoodUser {id} not found")
         try:
             data = request.get_json()
-            for k, v in data.items():
-                setattr(food_user, k, v)
+            # Update the user's attributes
+            if 'username' in data:
+                food_user.username = data['username']
+            if 'email' in data:
+                food_user.email = data['email'] 
+            # Add other fields as necessary
+
             db.session.commit()
-            return food_user.to_dict(), 200
+            return {'message': 'User updated successfully'}, 200
         except Exception as e:
             db.session.rollback()
             return {'message': str(e)}, 400

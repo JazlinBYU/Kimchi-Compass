@@ -4,6 +4,8 @@ from sqlalchemy.orm import validates
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash
 from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.ext.hybrid import hybrid_property
+
 
 from config import db, bcrypt
 
@@ -13,7 +15,7 @@ class FoodUser(db.Model, UserMixin, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True, nullable=True)  # Made nullable for OAuth users
     email = db.Column(db.String(100), unique=True, nullable=False)
-    password_hash = db.Column(db.String, nullable=True)  # Nullable for OAuth users
+    _password_hash = db.Column(db.String, nullable=True)  # Nullable for OAuth users
     google_id = db.Column(db.String(100), unique=True, nullable=True)  # Google OAuth ID
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, onupdate=db.func.now())
@@ -38,25 +40,26 @@ class FoodUser(db.Model, UserMixin, SerializerMixin):
             raise ValueError("Username must be at least 1 characters")
         return username
 
-    @validates('email')
-    def validate_email(self, key, email):
-        if not email:
-            raise ValueError('Email is required')
-        if len(email) > 100:
-            raise ValueError('Email must be at most 100 characters')
-        if '@' not in email or '.' not in email:
-            raise ValueError('Invalid email address')
-        return email
+    # @validates('email')
+    # def validate_email(self, key, email):
+    #     if not email:
+    #         raise ValueError('Email is required')
+    #     if len(email) > 100:
+    #         raise ValueError('Email must be at most 100 characters')
+    #     if '@' not in email or '.' not in email:
+    #         raise ValueError('Invalid email address')
+    #     return email
 
-    @property
-    def password(self):
-        return self.password_hash
+    @hybrid_property
+    def password_hash(self):
+        # return self._password_hash
+        raise AttributeError("Password hashes are super secret!")
 
-    @password.setter
-    def password(self, plaintext_password):
-        self.password_hash = generate_password_hash(plaintext_password) 
+    @password_hash.setter
+    def password_hash(self, new_password):
+        hashed_password = bcrypt.generate_password_hash(new_password).decode("utf-8")
+        self._password_hash = hashed_password
 
-
-    def authenticate(self, plaintext_password):
-        return bcrypt.check_password_hash(self.password_hash, plaintext_password)
-
+    def authenticate(self, password_to_check):
+        return bcrypt.check_password_hash(self._password_hash, password_to_check)
+ 

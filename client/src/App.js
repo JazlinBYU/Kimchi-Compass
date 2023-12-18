@@ -20,7 +20,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/register" element={<SignUp />} />
             <Route path="/restaurants/:id" element={<RestaurantDetails />} />
-            <Route path="/profile" element={<UserProfile />} />
+            <Route path="/profile/:id" element={<UserProfile />} />
             <Route path="/add-restaurant" element={<AddRestaurantForm />} />
             {/* <Route path="*" element={<ErrorPage />} />{" "} */}
             {/* Handle unmatched routes */}

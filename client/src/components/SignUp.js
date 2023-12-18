@@ -1,12 +1,13 @@
-import { useState } from "react";
-import { useNavigate, useOutletContext } from "react-router-dom";
+import { useContext, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useSnackbar } from "notistack";
+import { UserContext } from "../UserContext";
 
 const SignUp = () => {
   const navigate = useNavigate();
-  const { updateUser } = useOutletContext();
+  const { updateUser } = useContext(UserContext);
   const [isSignUp, setIsSignUp] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
 

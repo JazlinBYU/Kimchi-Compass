@@ -24,6 +24,10 @@ export const UserProvider = ({ children }) => {
     }
   }, []);
 
+  const updateUser = (newUser) => {
+    setCurrentUser(newUser); // Update state with the new user data
+  };
+
   const login = (token, user) => {
     localStorage.setItem("token", token); // Store the JWT token in local storage
     setCurrentUser(user); // Update state with the user data
@@ -35,7 +39,8 @@ export const UserProvider = ({ children }) => {
   };
 
   return (
-    <UserContext.Provider value={{ currentUser, isLoading, login, logout }}>
+    <UserContext.Provider
+      value={{ currentUser, isLoading, login, logout, updateUser }}>
       {children}
     </UserContext.Provider>
   );

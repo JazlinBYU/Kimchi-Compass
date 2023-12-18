@@ -124,7 +124,7 @@ def seed_database():
             food_user = FoodUser(
                 username=fake.user_name(),
                 email=fake.email(),
-                password_hash=fake.password()  # In reality, hash this password
+                _password_hash=fake.password()  # In reality, hash this password
             )
             db.session.add(food_user)
 

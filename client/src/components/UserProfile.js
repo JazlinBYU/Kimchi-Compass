@@ -10,7 +10,6 @@ const UserProfile = () => {
 
   useEffect(() => {
     if (currentUser) {
-      // Replace '/users/:id' with your actual endpoint to fetch user data including favorites
       fetch(`/food_users/${currentUser.id}`)
         .then((response) => {
           if (response.ok) {
