@@ -1,12 +1,10 @@
-#!/usr/bin/env python3
 
-from flask import Flask, jsonify, request, redirect, url_for
+from flask import Flask, jsonify, request, redirect, url_for, session
 from flask_restful import Resource
 from werkzeug.exceptions import NotFound
 from werkzeug.security import check_password_hash
 from authlib.integrations.flask_client import OAuth
-from flask_login import LoginManager, login_user, logout_user, UserMixin
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+from flask_login import LoginManager, login_user, logout_user, UserMixin, login_required
 from config import app, db, api, bcrypt
 
 # Import your model files
@@ -21,9 +19,8 @@ from favorite import Favorite
 # Initialize OAuth and Flask-Login
 oauth = OAuth(app)
 login_manager = LoginManager(app)
-jwt = JWTManager(app)
 
-app.config['JWT_SECRET_KEY'] = 'super-secret'  # Change this to a random secret key
+app.secret_key = 'AfLm8OuKhH416azwazV_KA'  # Change this to a random secret key
 
 # OAuth Configuration for Google
 google = oauth.register(
@@ -122,18 +119,12 @@ api.add_resource(Restaurants, "/restaurants")
 class RestaurantsById(Resource):
     def get(self, id):
         restaurant = Restaurant.query.get_or_404(id, description=f"Restaurant {id} not found")
-        # Use joinedload or subqueryload to load the favorites and then the users for those favorites
-        # This prevents N+1 query issues by loading the associated data in one or two queries.
         restaurant = restaurant.to_dict(only=(
             "id", "name", "rating", "phone_number", "image_url", 
             "reviews.content", "reviews.rating", "reviews.review_date", "reviews.food_user_id",
-            # Now include a path to the usernames of the users who favorited this restaurant
             "favorites.food_user.username"
         ))
-        # The `favorites.food_user.username` will return a list of usernames who favorited the restaurant
-        # We need to flatten this list since it's coming from a nested relationship
         restaurant['favorited_by'] = [fav['food_user']['username'] for fav in restaurant['favorites']]
-        # Now remove the 'favorites' key as we've extracted the usernames into 'favorited_by'
         del restaurant['favorites']
         return restaurant, 200
 
@@ -224,30 +215,41 @@ class Dishes(Resource):
 
 api.add_resource(Dishes, "/dishes")
 
-class Login(Resource):
-    def post(self):
-        data = request.get_json()
-        email = data.get('email', None)
-        password = data.get('password', None)
+class Login(Resource): 
+    def post(self): 
+        try:
+            data = request.get_json()
+            user = FoodUser.query.filter(
+                (FoodUser.username == data.get('username')) | 
+                (FoodUser.email == data.get('username'))
+            ).first()
 
-        if not email or not password:
-            return jsonify({"msg": "Email and password are required"}), 400
-
-        food_user = FoodUser.query.filter_by(email=email).first()
-        if food_user and check_password_hash(food_user.password_hash, password):
-            access_token = create_access_token(identity=food_user.id)
-            return jsonify(access_token=access_token), 200
-        else:
-            return jsonify({"msg": "Bad username or password"}), 401
+            if user and user.authenticate(data.get('password')):
+                session['user_id'] = user.id
+                return {'message': 'Login successful'}, 200
+            else:
+                return {'message': 'Invalid Credentials'}, 403
+        except Exception as e:
+            return {'message': str(e)}, 400
 
 api.add_resource(Login, '/login')
 
 class Logout(Resource):
-    @jwt_required()
     def delete(self):  
-        if "food_user_id" in session:
-            del session["food_user_id"]
+        session.pop('user_id', None)
         return {}, 204 
+
+api.add_resource(Logout, '/logout')
+
+class CheckSession(Resource): 
+    def get(self):  
+        if "food_user_id" not in session:
+            return {"message": "Not Authorized"}, 403
+        if food_user := db.session.get(FoodUser, session["food_user_id"]):
+            return food_user.to_dict(rules=("-email",)), 200
+        return {"message": "Not Authorized"}, 403
+
+api.add_resource(CheckSession, '/check_session') 
 
 # Google OAuth routes
 @app.route('/login/google')
@@ -267,15 +269,18 @@ def authorize():
         db.session.add(food_user)
         db.session.commit()
 
-    access_token = create_access_token(identity=user.id)
+    access_token = create_access_token(identity=food_user.id)
     return jsonify(access_token=access_token), 200
 
+@app.route('/current_user')
+def current_user():
+    food_user_id = session.get('food_user_id')
+    if food_user_id:
+        food_user = FoodUser.query.get(food_user_id)
+        return jsonify(food_user.to_dict()), 200
+    return jsonify(None), 401
 
-@app.route('/protected', methods=['GET'])
-@jwt_required()
-def protected():
-    current_food_user_id = get_jwt_identity()
-    return jsonify(logged_in_as=current_food_user_id), 200
+
 
 # @app.route('/users', methods=['POST'])
 # def login():

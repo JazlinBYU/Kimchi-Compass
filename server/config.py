@@ -35,4 +35,4 @@ bcrypt = Bcrypt(app)
 api = Api(app)
 
 # Instantiate CORS
-CORS(app)
+CORS(app, supports_credentials=True)  # Enable CORS with support for credentials

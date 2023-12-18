@@ -23,7 +23,7 @@ class FoodUser(db.Model, UserMixin, SerializerMixin):
     favorites = db.relationship('Favorite', back_populates='food_user', cascade='all, delete-orphan')
 
     # Serialize only specific fields
-    serialize_only = ("id", "username", "email", "review", "-review.food_user", "favorites", "-favorites.user" )
+    serialize_only = ("id", "username", "email", "reviews", "-reviews.food_user", "favorites", "-favorites.user" )
 
     restaurants = association_proxy("favorites", "restaurant")
 
@@ -57,9 +57,6 @@ class FoodUser(db.Model, UserMixin, SerializerMixin):
         self.password_hash = generate_password_hash(plaintext_password) 
 
 
-    def authenticate(self, password_to_check):
-        # This method is not used for OAuth users
-        if self.password_hash:
-            return bcrypt.check_password_hash(self._password_hash, password_to_check)
-        return False
+    def authenticate(self, plaintext_password):
+        return bcrypt.check_password_hash(self.password_hash, plaintext_password)
 
