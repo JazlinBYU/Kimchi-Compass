@@ -31,7 +31,7 @@ const AddRestaurantForm = () => {
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
-      const response = await fetch("http://localhost:5555/restaurants", {
+      const response = await fetch("/restaurants", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),

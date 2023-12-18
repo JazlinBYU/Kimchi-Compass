@@ -1,105 +1,115 @@
-import React, { useContext, useState } from "react";
+import { useState } from "react";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useSnackbar } from "notistack";
-import { UserContext } from "../UserContext";
 
 const SignUp = () => {
-  const { setUser } = useContext(UserContext);
-  const [formType, setFormType] = useState("signIn");
+  const navigate = useNavigate();
+  const { updateUser } = useOutletContext();
+  const [isSignUp, setIsSignUp] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
 
-  const initialValues = {
-    email: "",
-    username: "",
-    password: "",
-  };
-
-  const validationSchema = Yup.object({
-    email: Yup.string().email("Invalid email").required("Email is required"),
-    username: Yup.string().when("formType", {
-      is: "signUp",
-      then: Yup.string().required("Username is required"),
-    }),
-    password: Yup.string().required("Password is required"),
+  const loginSchema = Yup.object().shape({
+    username: Yup.string().required("Required"),
+    password: Yup.string().required("Required"),
   });
 
-  const handleSubmit = async (values, { setErrors }) => {
-    const endpoint =
-      formType === "signIn"
-        ? "http://localhost:5555/login"
-        : "http://localhost:5555/users";
+  const signUpSchema = Yup.object().shape({
+    email: Yup.string().email("Invalid email").required("Required"),
+    username: Yup.string().required("Required"),
+    password: Yup.string().required("Required"),
+  });
 
-    try {
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
+  const handleSubmit = async (values) => {
+    const endpoint = isSignUp ? "/food_users" : "/login";
+
+    fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(values),
+    })
+      .then((resp) => {
+        if (resp.ok) {
+          resp.json().then((userObj) => {
+            updateUser(userObj);
+            navigate(`/profile/${userObj.id}`);
+            enqueueSnackbar(
+              isSignUp ? "Sign up successful!" : "Login successful!",
+              { variant: "success" }
+            );
+          });
+        } else {
+          resp.json().then((err) => {
+            enqueueSnackbar(err.message, { variant: "error" });
+          });
+        }
+      })
+      .catch((err) => {
+        enqueueSnackbar("An error occurred during login.", {
+          variant: "error",
+        });
       });
-
-      const responseData = await response.json();
-
-      if (response.ok) {
-        setUser(responseData);
-        enqueueSnackbar(
-          formType === "signIn" ? "Sign in successful" : "Sign up successful",
-          { variant: "success" }
-        );
-      } else {
-        setErrors(responseData.errors);
-        enqueueSnackbar("Error during sign up/in", { variant: "error" });
-      }
-    } catch (error) {
-      console.error("Network error:", error);
-      setErrors({ network: "A network error occurred." });
-      enqueueSnackbar("Network error", { variant: "error" });
-    }
   };
 
   const handleOAuthSignIn = (provider) => {
-    const oauthWindow = window.open(`/auth/${provider}`, "_blank");
+    const oauthWindow = window.open(`/authorize/${provider}`, "_blank");
     oauthWindow.focus();
   };
 
   return (
-    <div>
+    <div className="main">
+      <h2>{isSignUp ? "Sign Up" : "Login"}</h2>
       <Formik
-        initialValues={initialValues}
-        validationSchema={validationSchema}
-        onSubmit={(values, actions) => handleSubmit(values, actions)}>
-        {({ values }) => (
+        initialValues={{ email: "", username: "", password: "" }}
+        validationSchema={isSignUp ? signUpSchema : loginSchema}
+        onSubmit={handleSubmit}>
+        {() => (
           <Form>
-            <Field type="email" name="email" placeholder="Email" />
-            <ErrorMessage name="email" component="div" />
-
-            {formType === "signUp" && (
+            {isSignUp && (
               <>
-                <Field type="text" name="username" placeholder="Username" />
-                <ErrorMessage name="username" component="div" />
+                <label>Email</label>
+                <Field name="email" type="email" className="block" />
+                <ErrorMessage name="email" component="div" />
               </>
             )}
-
-            <Field type="password" name="password" placeholder="Password" />
+            <label>Username</label>
+            <Field name="username" type="text" className="block" />
+            <ErrorMessage name="username" component="div" />
+            <label>Password</label>
+            <Field name="password" type="password" className="block" />
             <ErrorMessage name="password" component="div" />
-
-            <div>
-              <button type="button" onClick={() => setFormType("signUp")}>
-                Sign Up
-              </button>
-              <button type="button" onClick={() => setFormType("signIn")}>
-                Sign In
-              </button>
+            <div className="buttons">
+              <button type="submit">{isSignUp ? "Sign Up" : "Login"}</button>
             </div>
-
-            <button type="submit">
-              {formType === "signUp" ? "Create Account" : "Log In"}
-            </button>
-            <ErrorMessage name="network" component="div" />
           </Form>
         )}
       </Formik>
-      <h2>Or Sign In with</h2>
-      <button onClick={() => handleOAuthSignIn("google")}>Google</button>
+      <div>
+        {isSignUp ? (
+          <>
+            <p>
+              Already have an account?{" "}
+              <button onClick={() => setIsSignUp(false)}>Login here</button>
+            </p>
+          </>
+        ) : (
+          <>
+            <p>
+              New to Kimchi-Compass?{" "}
+              <button onClick={() => setIsSignUp(true)}>
+                Sign up for a free account
+              </button>
+            </p>
+            <p>
+              <h2>Or Sign In with</h2>
+              <button onClick={() => handleOAuthSignIn("google")}>
+                Google
+              </button>
+            </p>
+          </>
+        )}
+      </div>
     </div>
   );
 };

@@ -1,9 +1,9 @@
 from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy.orm import validates
+from sqlalchemy.ext.associationproxy import association_proxy
+
 from config import db
-from review import Review
-from menu import Menu
-from dish import Dish
+
 
 class Restaurant(db.Model, SerializerMixin):
     __tablename__ = 'restaurants'
@@ -18,10 +18,12 @@ class Restaurant(db.Model, SerializerMixin):
     # Relationships
     reviews = db.relationship('Review', back_populates='restaurant', cascade='all, delete-orphan')
     menus = db.relationship('Menu', back_populates='restaurant', cascade='all, delete-orphan')
-    favorites = db.relationship('Favorite', back_populates='restaurant', cascade='all, delete-orphan')
+    favorites = db.relationship('Favorite', back_populates='restaurant')
 
     # Serialization
-    serialize_only = ("id", "name", "rating", "image_url", "phone_number")#, "reviews","-reviews.restaurant", "menus","-menus.restaurant", "favorites","-favorites.restaurant","address")
+    serialize_only = ("id", "name", "rating", "image_url", "phone_number", "reviews","-reviews.restaurant", "menus","-menus.restaurant", "favorites","-favorites.restaurant","address")
+
+    food_users = association_proxy("favorites", "food_user")
 
     def __repr__(self):
         return f"<Restaurant {self.id}: {self.name}>"

@@ -1,14 +1,14 @@
 # user.py
 from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy.orm import validates
-from sqlalchemy.ext.hybrid import hybrid_property
 from flask_login import UserMixin
-
+from werkzeug.security import generate_password_hash
+from sqlalchemy.ext.associationproxy import association_proxy
 
 from config import db, bcrypt
 
-class User(db.Model, SerializerMixin, UserMixin):
-    __tablename__ = 'users'
+class FoodUser(db.Model, UserMixin, SerializerMixin):
+    __tablename__ = 'food_users'
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True, nullable=True)  # Made nullable for OAuth users
@@ -19,16 +19,23 @@ class User(db.Model, SerializerMixin, UserMixin):
     updated_at = db.Column(db.DateTime, onupdate=db.func.now())
 
     # Relationships
-    reviews = db.relationship('Review', back_populates='user', cascade='all, delete-orphan')
-    favorites = db.relationship('Favorite', back_populates='user', cascade='all, delete-orphan')
+    reviews = db.relationship('Review', back_populates='food_user', cascade='all, delete-orphan')
+    favorites = db.relationship('Favorite', back_populates='food_user', cascade='all, delete-orphan')
 
     # Serialize only specific fields
-    serialize_only = ("id", "username", "email", "reviews", "-reviews.user", "favorites", "-favorites.user" )
+    serialize_only = ("id", "username", "email", "review", "-review.food_user", "favorites", "-favorites.user" )
 
-    @validates('username')
-    def validate_username(self, key, username):
-        if username and len(username) > 50:
-            raise ValueError('Username must be at most 50 characters')
+    restaurants = association_proxy("favorites", "restaurant")
+
+    def __repr__(self):
+        return f"<FoodUser {self.id}: {self.username}>"
+
+    @validates("username")
+    def validate_username(self, _, username):
+        if not isinstance(username, str):
+            raise TypeError("Username must be a string")
+        elif len(username) < 1:
+            raise ValueError("Username must be at least 1 characters")
         return username
 
     @validates('email')
@@ -41,14 +48,13 @@ class User(db.Model, SerializerMixin, UserMixin):
             raise ValueError('Invalid email address')
         return email
 
-    @hybrid_property
+    @property
     def password(self):
-        raise AttributeError("Password hashes are super secret!")
+        return self.password_hash
 
     @password.setter
-    def password(self, new_password):
-        hashed_password = bcrypt.generate_password_hash(new_password).decode("utf-8")
-        self.password_hash = hashed_password  # Fixed the attribute name
+    def password(self, plaintext_password):
+        self.password_hash = generate_password_hash(plaintext_password) 
 
 
     def authenticate(self, password_to_check):

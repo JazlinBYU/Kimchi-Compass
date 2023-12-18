@@ -11,7 +11,7 @@ const UserProfile = () => {
   useEffect(() => {
     if (currentUser) {
       // Replace '/users/:id' with your actual endpoint to fetch user data including favorites
-      fetch(`/users/${currentUser.id}`)
+      fetch(`/food_users/${currentUser.id}`)
         .then((response) => {
           if (response.ok) {
             response.json().then(setUserInfo);
@@ -31,7 +31,7 @@ const UserProfile = () => {
     }
 
     // Replace '/users/:id' with your actual endpoint for user deletion
-    fetch(`/users/${currentUser.id}`, { method: "DELETE" })
+    fetch(`/food_users/${currentUser.id}`, { method: "DELETE" })
       .then((response) => {
         if (response.ok) {
           logout();

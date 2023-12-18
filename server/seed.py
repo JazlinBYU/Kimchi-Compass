@@ -9,8 +9,9 @@ from restaurant import Restaurant
 from menu import Menu
 from dish import Dish
 from menu_dish import MenuDish
-from user import User
+from food_user import FoodUser
 from review import Review
+from random import sample 
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'  # Ensure this matches your actual database URI
@@ -36,13 +37,23 @@ def get_yelp_data():
     except requests.RequestException as e:
         print(f"Error fetching data from Yelp API: {e}")
         return []
+    
+def add_favorite(food_user_id, restaurant_id):
+    try:
+        new_favorite = Favorite(food_user_id=food_user_id, restaurant_id=restaurant_id)
+        db.session.add(new_favorite)
+        db.session.commit()
+        print(f"Added favorite: FoodUser {food_user_id} -> Restaurant {restaurant_id}")
+    except Exception as e:
+        print(f"Failed to add favorite: {e}")
+        db.session.rollback()
 
 def seed_database():
     fake = Faker()
     try:
         # Seed restaurants from Yelp data
         yelp_data = get_yelp_data()
-        for data in yelp_data:
+        for data in yelp_data:  
             name = data.get('name')
             rating = data.get('rating')
             image_url = data.get('image_url')
@@ -110,24 +121,36 @@ def seed_database():
 
                 # Seed fake users
         for _ in range(10):  # Adjust number as needed
-            user = User(
+            food_user = FoodUser(
                 username=fake.user_name(),
                 email=fake.email(),
                 password_hash=fake.password()  # In reality, hash this password
             )
-            db.session.add(user)
+            db.session.add(food_user)
 
         db.session.commit()
+        
+        # Seed favorites
+        food_users = FoodUser.query.all()
+        restaurants = Restaurant.query.all()
+
+# Let's assume each user favorites 2 restaurants
+        for food_user in food_users:
+            favorite_restaurants = sample(restaurants, 2)  # Select 2 random restaurants
+            for restaurant in favorite_restaurants:
+                add_favorite(food_user.id, restaurant.id)
+
+
 
         # Seed fake reviews
-        users = User.query.all()
+        food_users = FoodUser.query.all()
         for restaurant in restaurants:
             for _ in range(5):  # Adjust number as needed
                 review = Review(
                     content=fake.text(),
                     rating=randint(1, 5),
                     review_date=datetime.utcnow(),
-                    user_id=choice(users).id,
+                    food_user_id=choice(food_users).id,
                     restaurant_id=restaurant.id
                 )
                 db.session.add(review)
