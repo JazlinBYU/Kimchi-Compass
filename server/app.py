@@ -53,6 +53,7 @@ class FoodUsers(Resource):
             new_food_user.password_hash = data.get('password')
             db.session.add(new_food_user)
             db.session.commit()
+            session["food_user_id"]=new_food_user.id
             return new_food_user.to_dict(), 201
         except Exception as e:
             db.session.rollback()
@@ -225,13 +226,12 @@ class Login(Resource):
         try:
             data = request.get_json()
             user = FoodUser.query.filter(
-                (FoodUser.username == data.get('username')) | 
-                (FoodUser.email == data.get('username'))
+                (FoodUser.username == data.get('username'))  
             ).first()
 
             if user and user.authenticate(data.get('password')):
-                session['user_id'] = user.id
-                return {'message': 'Login successful'}, 200
+                session['food_user_id'] = user.id
+                return user.to_dict(), 200
             else:
                 return {'message': 'Invalid Credentials'}, 403
         except Exception as e:
@@ -241,7 +241,7 @@ api.add_resource(Login, '/login')
 
 class Logout(Resource):
     def delete(self):  
-        session.pop('user_id', None)
+        session.pop('food_user_id', None)
         return {}, 204 
 
 api.add_resource(Logout, '/logout')

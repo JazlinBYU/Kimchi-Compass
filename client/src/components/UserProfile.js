@@ -25,20 +25,33 @@ const UserProfile = () => {
   }, [currentUser]);
 
   const deleteProfile = () => {
-    if (!currentUser) {
+    // Confirm with the user before deletion
+    if (!window.confirm("Are you sure you want to delete your profile?")) {
       return;
     }
 
-    // Replace '/users/:id' with your actual endpoint for user deletion
+    if (!currentUser) {
+      alert("No user is currently logged in.");
+      return;
+    }
+
     fetch(`/food_users/${currentUser.id}`, { method: "DELETE" })
       .then((response) => {
         if (response.ok) {
           logout();
           navigate("/");
+          alert("Your profile has been successfully deleted.");
         } else {
+          // Handle non-ok responses
+          response.json().then((errorData) => {
+            alert(`Failed to delete profile: ${errorData.message}`);
+          });
         }
       })
-      .catch((error) => {});
+      .catch((error) => {
+        console.error("Error:", error);
+        alert("An error occurred while trying to delete your profile.");
+      });
   };
 
   const favoriteRestaurants = userInfo.favorites?.map((favorite) => (
