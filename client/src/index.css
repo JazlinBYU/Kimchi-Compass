@@ -1,24 +1,193 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Palatino, "Cinzel", Times, serif;
+}
+
 :root {
-  --bg: #282c34;
-  --header: #fff;
-  --link: #61dafb;
-  --text: hsla(0, 0%, 100%, 0.88);
+  --light-purp: #c8bf96;
+  --med1-purp: #5f422e;
+  --med2-purp: #1d3235;
+  --dark-purp: #a08dca;
+
+  --bg-color: #301a1ac7;
+  --main-txt-color: #b6af33;
+
+  background: var(--bg-color);
+  color: var(--main-txt-color);
 }
 
-.restaurant-card {
-  border: 1px solid #ddd;
-  padding: 15px;
-  margin: 10px 0;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+#outlet {
+  padding: 2rem 4rem;
+  display: flex;
+  justify-content: center;
 }
 
-.restaurant-card img {
-  max-width: 100%;
-  height: auto;
-  border-radius: 8px;
+#header {
+  height: 175px;
+  width: 100%;
+  padding: 2rem;
+  background-color: var(--med1-purp);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Add shadow for depth */
 }
 
-.restaurant-card h3 {
-  margin: 10px 0;
+.logo {
+  background: transparent !important;
+  width: 400px;
+  height: 120px; /* Set a fixed height for your logo */
+  display: grid;
+  padding-top: 1%;
+  margin-right: 600px; /* Add some margin to the right */
+  margin-left: 650px;
+}
+
+a {
+  text-decoration: none;
+  color: var(--main-txt-color);
+}
+
+a:hover {
+  text-decoration: none;
+  color: var(--light-purp);
+}
+
+h2 {
+  font-family: "Nothing You Could Do", "Cinzel", "Brush Script MT", Palatino;
+  margin: 1rem;
+  font-size: 2.25rem;
+}
+
+h3,
+p,
+ul {
+  margin: 1rem;
+  font-weight: normal;
+}
+
+ul {
+  padding: 0 2rem;
+}
+
+.subtle {
+  font-style: italic;
+  color: var(--light-purp);
+}
+
+button,
+form input[type="submit"] {
+  padding: 0.5rem 2.5rem;
+  border: 2px solid var(--light-purp);
+  text-decoration: none;
+  background-color: rgba(213, 175, 175, 0);
+  color: var(--main-txt-color);
+  font-size: 1.25rem;
+  margin: 0 2rem;
+  display: inline;
+  float: right;
+}
+
+button:hover,
+form input[type="submit"]:hover {
+  cursor: pointer;
+  color: var(--light-purp);
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+#banner {
+  display: grid;
+  gap: 2rem;
+  grid-auto-columns: 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  padding: 2rem;
+}
+
+.restaurant-list {
+  display: flex;
+  gap: 3rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.card {
+  width: 475px;
+  height: 350px;
+  position: relative;
+  box-shadow: 15px 10px 10px rgba(0, 0, 0, 0.2); /* Add shadow for depth */
+}
+
+.card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.details {
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 1rem;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+}
+
+.details .hidden {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 2s;
+  will-change: max-height;
+}
+
+.card:hover .hidden {
+  max-height: 200px;
+}
+
+.one_restaurant {
+  min-width: 400px;
+  max-width: 900px;
+}
+
+.restaurant_details {
+  min-width: 300px;
+  max-width: 600px;
+}
+
+aside {
+  min-width: 100px;
+  max-width: 300px;
+}
+
+.one_restaurant img {
+  width: 100%;
+  height: 600px;
+  object-fit: cover;
+}
+
+.main {
+  margin: auto;
+  padding: 2rem;
+  min-width: 400px;
+  max-width: 80%;
+}
+
+.buttons {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  padding: 2rem;
+  justify-content: flex-end;
+}
+
+label,
+.block {
+  display: block;
+  margin: 1rem;
+  width: 80%;
+}
+
+.textarea {
+  height: 100px;
 }

@@ -9,23 +9,26 @@ export const UserContext = createContext({
 });
 
 export const UserProvider = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [currentUser, setCurrentUser] = useState(
+    JSON.parse(localStorage.getItem("currentUser"))
+  );
 
   useEffect(() => {
-    // Replace with your endpoint or local storage key
-    const token = localStorage.getItem("token");
-    if (token) {
-      // Here you would typically have an endpoint to validate the token and fetch user data
-      // For now, we'll assume the token is valid and skip that step
-      setIsLoading(false);
-    } else {
-      setIsLoading(false);
+    // On app load, check if user data is stored in localStorage
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setCurrentUser(JSON.parse(storedUser));
     }
   }, []);
 
   const updateUser = (newUser) => {
-    setCurrentUser(newUser); // Update state with the new user data
+    setCurrentUser(newUser);
+    localStorage.setItem("currentUser", JSON.stringify(newUser)); // Save user to local storage
+  };
+
+  const logout = () => {
+    setCurrentUser(null);
+    localStorage.removeItem("currentUser"); // Clear user from local storage
   };
 
   const login = (token, user) => {
@@ -33,14 +36,8 @@ export const UserProvider = ({ children }) => {
     setCurrentUser(user); // Update state with the user data
   };
 
-  const logout = () => {
-    localStorage.removeItem("token"); // Remove the JWT token from local storage
-    setCurrentUser(null); // Update state to reflect that the user is logged out
-  };
-
   return (
-    <UserContext.Provider
-      value={{ currentUser, isLoading, login, logout, updateUser }}>
+    <UserContext.Provider value={{ currentUser, login, logout, updateUser }}>
       {children}
     </UserContext.Provider>
   );

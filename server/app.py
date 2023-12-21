@@ -1,5 +1,5 @@
 
-from flask import Flask, jsonify, request, redirect, url_for, session
+from flask import Flask, jsonify, request, redirect, url_for, session, make_response
 from flask_restful import Resource
 from werkzeug.exceptions import NotFound
 from werkzeug.security import check_password_hash
@@ -15,6 +15,8 @@ from dish import Dish
 from menu_dish import MenuDish
 from review import Review
 from favorite import Favorite
+import requests, json 
+
 
 # Initialize OAuth and Flask-Login
 oauth = OAuth(app)
@@ -26,7 +28,7 @@ app.secret_key = 'AfLm8OuKhH416azwazV_KA'  # Change this to a random secret key
 google = oauth.register(
     name='google',
     client_id='9656575814-i0rc5aehtlvhkv8fu23gnmgrtnspf5ps.apps.googleusercontent.com',
-    client_secret='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',
+    # client_secret='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',
     access_token_url='https://accounts.google.com/o/oauth2/token',
     authorize_url='https://accounts.google.com/o/oauth2/auth',
     api_base_url='https://www.googleapis.com/oauth2/v1/',
@@ -160,16 +162,24 @@ api.add_resource(Menus, "/menus")
 
 class Favorites(Resource):
     def post(self):
-        if 'user_id' not in session:
+        # Check if a user is logged in
+        if 'food_user_id' not in session:
             return {'error': 'FoodUser not logged in'}, 401
 
-        user_id = session['user_id']
-        restaurant_id = request.json.get('favorite_id')
+        # Parse the incoming data to get the restaurant_id
+        parser = reqparse.RequestParser()
+        parser.add_argument('restaurant_id', required=True, help="restaurant_id cannot be blank")
+        args = parser.parse_args()
 
+        user_id = session['food_user_id']
+        restaurant_id = args['restaurant_id']
+
+        # Check if the user has already favorited this restaurant
         favorite = Favorite.query.filter_by(food_user_id=user_id, restaurant_id=restaurant_id).first()
         if favorite:
-            return {'message': 'You already have this favorited!'}, 400
+            return {'message': 'You already have this restaurant favorited!'}, 400
 
+        # If not already favorited, create a new favorite record
         try:
             new_fav = Favorite(food_user_id=user_id, restaurant_id=restaurant_id)
             db.session.add(new_fav)
@@ -179,12 +189,10 @@ class Favorites(Resource):
             db.session.rollback()
             return {'message': str(e)}, 400
 
-api.add_resource(Favorites, "/favorites")
-
 class FavoritesById(Resource):
     def delete(self, id):
         try:
-            user_id = session['user_id']
+            user_id = session['food_user_id']
             favorite = Favorites.query.filter_by(food_user_id=user_id, restaurant_id=id).first()
 
             if favorite:
@@ -192,7 +200,7 @@ class FavoritesById(Resource):
                 db.session.commit()
                 return {}, 201
             else:
-                return {'message': f'Food_User {id} does not have restaurant {id}'}, 400
+                return {'message': f'FoodUser {id} does not have restaurant {id}'}, 400
 
         except Exception as e:
             db.session.rollback()
@@ -257,10 +265,24 @@ class CheckSession(Resource):
 api.add_resource(CheckSession, '/check_session') 
 
 # Google OAuth routes
-@app.route('/login/google')
+@app.route('/login/google', methods=["POST"])
 def google_login():
-    redirect_uri = url_for('authorize', _external=True)
-    return google.authorize_redirect(redirect_uri)
+    data = json.loads(request.data)
+    req = requests.get(
+        f"https://www.googleapis.com/oauth2/v1/userinfo?access_token={data['access_token']}",
+        headers={"Content-Type": "text"})
+    # redirect_uri = url_for('authorize', _external=True
+    res=req.json()
+    if res["verified_email"]:
+        food_user = FoodUser.query.filter_by(email=res["email"]).first()
+        if not food_user:
+            food_user = FoodUser(username = res['name'], email = res['email'])
+            food_user.password_hash = "password"
+            db.session.add(food_user)
+            db.session.commit()
+        food_user=food_user.to_dict()
+        return make_response(food_user, 200)
+    return make_response({"message":"this doesnt work"}, 200)
 
 @app.route('/authorize')
 def authorize():

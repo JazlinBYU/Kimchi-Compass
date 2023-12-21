@@ -50,6 +50,13 @@ const Home = () => {
 
   return (
     <div>
+      <div className="main">
+        <h2>Turn on your appetite!</h2>
+        <h3>
+          Join us at Kimchi-Compass where you can keep all of your favorite
+          Korean restaurants all in one easy to use app.
+        </h3>
+      </div>
       {alertMessage && <p className="alert">{alertMessage}</p>}{" "}
       {/* Display alert messages */}
       <SearchFilter value={searchTerm} onChange={handleSearchChange} />

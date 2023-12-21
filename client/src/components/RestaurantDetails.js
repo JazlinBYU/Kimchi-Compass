@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useSnackbar } from "notistack";
-import { useOutletContext } from "react-router-dom";
+import { UserContext } from "../UserContext"; // Ensure this path is correct
 
 const RestaurantDetails = () => {
-  const { user } = useOutletContext() || {};
+  const { user } = useContext(UserContext);
   const { enqueueSnackbar } = useSnackbar();
   const { id } = useParams();
   const [restaurant, setRestaurant] = useState({});
@@ -17,7 +17,8 @@ const RestaurantDetails = () => {
     address,
     reviews,
     favorites,
-    food_users, // Assuming this is an array of users who have favorited the restaurant
+    food_users,
+    food_user, // Assuming this is an array of users who have favorited the restaurant
   } = restaurant;
 
   useEffect(() => {
@@ -29,7 +30,7 @@ const RestaurantDetails = () => {
       .catch((error) => {
         enqueueSnackbar(`Error: ${error.message}`, { variant: "error" });
       });
-  }, [id, enqueueSnackbar]);
+  }, [id, enqueueSnackbar, user]);
 
   useEffect(() => {
     if (user && restaurant.food_users) {
@@ -47,61 +48,47 @@ const RestaurantDetails = () => {
   };
 
   const handleSaveFavorite = () => {
-    if (!user) {
-      enqueueSnackbar("You must be logged in to add a favorite.", {
-        variant: "warning",
-      });
-      return;
-    }
+    // if (!user) {
+    //   enqueueSnackbar("You must be logged in to add a favorite.", {
+    //     variant: "warning",
+    //   });
+    //   return;
+    // }
 
-    fetch(`/api/favorites`, {
+    // Proceed with your fetch request since `user` is defined
+    fetch(`/favorites`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        // Include other headers as needed, like authorization tokens
-      },
-      body: JSON.stringify({ restaurantId: id, userId: user.id }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ restaurantId: id, food_userId: user }),
     })
-      .then((response) => {
-        if (!response.ok) throw new Error("Failed to save favorite");
-        return response.json();
-      })
       .then(() => {
         setHasFavorited(true);
         enqueueSnackbar("Favorite added successfully!", { variant: "success" });
-        // Additional state updates as needed
       })
       .catch((error) => {
+        console.error("Error saving favorite", error);
         enqueueSnackbar(error.message, { variant: "error" });
       });
   };
 
   const handleDeleteFavorite = () => {
-    // You need to know the ID of the favorite to delete it
-    // This ID should be stored in your state or could be determined some other way
-    const favoriteId =
-      /* The ID of the user's favorite to delete */
-
-      fetch(`/api/favorites/${favoriteId}`, {
-        method: "DELETE",
-        headers: {
-          // Include headers as needed
-        },
+    const favoriteId = fetch(`/favorites/${favoriteId}`, {
+      method: "DELETE",
+      headers: {},
+    })
+      .then((response) => {
+        if (!response.ok) throw new Error("Failed to remove favorite");
+        return response.json();
       })
-        .then((response) => {
-          if (!response.ok) throw new Error("Failed to remove favorite");
-          return response.json();
-        })
-        .then(() => {
-          setHasFavorited(false);
-          enqueueSnackbar("Favorite removed successfully!", {
-            variant: "success",
-          });
-          // Additional state updates as needed
-        })
-        .catch((error) => {
-          enqueueSnackbar(error.message, { variant: "error" });
+      .then(() => {
+        setHasFavorited(false);
+        enqueueSnackbar("Favorite removed successfully!", {
+          variant: "success",
         });
+      })
+      .catch((error) => {
+        enqueueSnackbar(error.message, { variant: "error" });
+      });
   };
 
   const reviewList = reviews?.map((review) => (
@@ -115,12 +102,12 @@ const RestaurantDetails = () => {
   ));
 
   return (
-    <div className="restaurant_details">
+    <div className="one_restaurant">
       <h2>{name}</h2>
       <img src={image_url} alt={name} />
 
       <div className="container">
-        <main className="details">
+        <main className="restaurant_details">
           <p>Rating: {rating}</p>
           <p>Phone Number: {phone_number}</p>
           <ul>{reviewList}</ul>

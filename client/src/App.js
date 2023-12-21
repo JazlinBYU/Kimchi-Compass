@@ -1,34 +1,40 @@
-import React from "react";
-import { Route, Routes } from "react-router-dom";
-import { SnackbarProvider } from "notistack";
-import { UserProvider } from "./UserContext";
-import Home from "./components/Home";
-import SignUp from "./components/SignUp";
-import RestaurantDetails from "./components/RestaurantDetails";
-import UserProfile from "./components/UserProfile";
-import AddRestaurantForm from "./components/AddRestaurantForm";
+import React, { useState, useEffect } from "react";
+import Header from "./components/Header";
+import AppRoutes from "./components/routes"; // Import the routes file
+import { useSnackbar } from "notistack";
 
-function App() {
+const App = () => {
+  const [user, setUser] = useState(null);
+  const { enqueueSnackbar } = useSnackbar(); // Using notistack for notifications
+
+  useEffect(() => {
+    fetch("/check_session")
+      .then((resp) => {
+        if (resp.ok) {
+          resp.json().then(setUser);
+        } else {
+          resp.json().then((errorObj) => {
+            enqueueSnackbar(errorObj.message, { variant: "error" }); // notistack for displaying error
+          });
+        }
+      })
+      .catch((error) => {
+        enqueueSnackbar("Error checking session", { variant: "error" }); // notistack for displaying error
+      });
+  }, []);
+
+  const updateUser = (user) => {
+    setUser(user);
+  };
+
+  const ctx = { user, updateUser };
+
   return (
-    <UserProvider>
-      <SnackbarProvider maxSnack={3}>
-        {" "}
-        {/* Wrap with SnackbarProvider */}
-        <div>
-          {/* Navigation Bar and other shared components */}
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/register" element={<SignUp />} />
-            <Route path="/restaurants/:id" element={<RestaurantDetails />} />
-            <Route path="/profile/:id" element={<UserProfile />} />
-            <Route path="/add-restaurant" element={<AddRestaurantForm />} />
-            {/* <Route path="*" element={<ErrorPage />} />{" "} */}
-            {/* Handle unmatched routes */}
-          </Routes>
-        </div>
-      </SnackbarProvider>
-    </UserProvider>
+    <div>
+      <Header user={user} updateUser={updateUser} />
+      <AppRoutes context={ctx} />
+    </div>
   );
-}
+};
 
 export default App;

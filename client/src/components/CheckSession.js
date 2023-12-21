@@ -1,62 +1,44 @@
 import { useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import Header from "./components/Header";
-import AlertBar from "./components/AlertBar";
+import { useSnackbar } from "notistack";
 
 const CheckSession = () => {
-  const [message, setMessage] = useState(null);
-  const [snackType, setSnackType] = useState("");
   const [user, setUser] = useState(null);
+  const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
-    fetch("/check_session")
+    fetch("/check_session", {
+      credentials: "include",
+    })
       .then((resp) => {
         if (resp.ok) {
           resp.json().then(setUser);
         } else {
           resp.json().then((errorObj) => {
-            handleSnackType("error");
-            setAlertMessage(errorObj.message);
+            enqueueSnackbar(errorObj.message, { variant: "error" });
           });
         }
       })
       .catch((errorObj) => {
-        handleSnackType("error");
-        setAlertMessage(errorObj.message);
+        enqueueSnackbar(errorObj.message || "An error occurred", {
+          variant: "error",
+        });
       });
-  }, []);
+  }, [enqueueSnackbar]);
 
-  const updateUser = (user) => {
-    setUser(user);
+  const updateUser = (newUser) => {
+    setUser(newUser);
+    // Optionally enqueue a snackbar message if needed
+    // enqueueSnackbar('User session updated', { variant: 'info' });
   };
 
-  const setAlertMessage = (msg) => setMessage(msg);
-
-  const handleSnackType = (type) => setSnackType(type);
-
-  const ctx = {
-    user,
-    setAlertMessage,
-    handleSnackType,
-    updateUser,
-  };
+  // The context is simplified since we're no longer using message and snackType
+  const ctx = { user, updateUser };
 
   return (
     <div>
-      <Header
-        user={user}
-        updateUser={updateUser}
-        setAlertMessage={setAlertMessage}
-        handleSnackType={handleSnackType}
-      />
-      {message && (
-        <AlertBar
-          message={message}
-          snackType={snackType}
-          setAlertMessage={setAlertMessage}
-          handleSnackType={handleSnackType}
-        />
-      )}
+      <Header user={user} updateUser={updateUser} />
       <div id="outlet">
         <Outlet context={ctx} />
       </div>

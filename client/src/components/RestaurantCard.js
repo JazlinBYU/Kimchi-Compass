@@ -1,17 +1,24 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
-const RestaurantCard = ({ restaurant }) => {
+const Card = ({ restaurant }) => {
+  const { id, image_url, name, rating, phone_number } = restaurant;
+
   return (
-    <div className="restaurant-card">
-      {restaurant.image_url && (
-        <img src={restaurant.image_url} alt={restaurant.name} />
-      )}
-      <h3>{restaurant.name}</h3>
-      {restaurant.rating && <p>Rating: {restaurant.rating} / 5</p>}
-      {restaurant.phone_number && <p>Phone: {restaurant.phone_number}</p>}
-      {restaurant.address && <p>Address: {restaurant.address}</p>}
+    <div className="card">
+      <img src={image_url} alt={name} />
+      <div className="details">
+        <h2>{name}</h2>
+        <div className="hidden">
+          <p>{rating}</p>
+          <p className="subtle">{phone_number}</p>
+          <Link to={`/restaurants/${id}`}>
+            <button>Learn more</button>
+          </Link>
+        </div>
+      </div>
     </div>
   );
 };
 
-export default RestaurantCard;
+export default Card;
