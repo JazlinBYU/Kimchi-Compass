@@ -1,4 +1,3 @@
-// UserContext.js
 import React, { createContext, useState, useEffect } from "react";
 
 export const UserContext = createContext({
@@ -9,35 +8,44 @@ export const UserContext = createContext({
 });
 
 export const UserProvider = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState(
-    JSON.parse(localStorage.getItem("currentUser"))
-  );
+  const [currentUser, setCurrentUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // On app load, check if user data is stored in localStorage
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setCurrentUser(JSON.parse(storedUser));
-    }
+    // Check session on app load
+    fetch("/check_session", {
+      credentials: "include", // Necessary for cookies to be sent and received
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && data.id) {
+          setCurrentUser(data);
+        }
+        setIsLoading(false);
+      })
+      .catch(() => setIsLoading(false));
   }, []);
 
   const updateUser = (newUser) => {
     setCurrentUser(newUser);
-    localStorage.setItem("currentUser", JSON.stringify(newUser)); // Save user to local storage
   };
 
   const logout = () => {
-    setCurrentUser(null);
-    localStorage.removeItem("currentUser"); // Clear user from local storage
+    fetch("/logout", {
+      method: "POST",
+      credentials: "include", // Necessary for cookies to be sent and received
+    }).then(() => {
+      setCurrentUser(null);
+    });
   };
 
-  const login = (token, user) => {
-    localStorage.setItem("token", token); // Store the JWT token in local storage
-    setCurrentUser(user); // Update state with the user data
+  const login = (userData) => {
+    setCurrentUser(userData); // Update state with the user data
   };
 
   return (
-    <UserContext.Provider value={{ currentUser, login, logout, updateUser }}>
+    <UserContext.Provider
+      value={{ currentUser, isLoading, login, logout, updateUser }}>
       {children}
     </UserContext.Provider>
   );

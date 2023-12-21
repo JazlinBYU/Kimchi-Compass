@@ -5,6 +5,7 @@ import SignUp from "../components/SignUp"; // Adjusted path
 import RestaurantDetails from "../components/RestaurantDetails"; // Adjusted path
 import UserProfile from "../components/UserProfile"; // Adjusted path
 import AddRestaurantForm from "../components/AddRestaurantForm"; // Adjusted path
+import ViewMenu from "../components/ViewMenu";
 
 const AppRoutes = ({ context }) => {
   return (
@@ -15,6 +16,8 @@ const AppRoutes = ({ context }) => {
         path="/restaurants/:id"
         element={<RestaurantDetails context={context} />}
       />
+      <Route path="/view-menu/:id" element={<ViewMenu />} />
+
       <Route path="/profile/:id" element={<UserProfile context={context} />} />
       <Route
         path="/add-restaurant"
