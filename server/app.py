@@ -22,7 +22,6 @@ import requests, json
 oauth = OAuth(app)
 login_manager = LoginManager(app)
 
-app.secret_key = 'AfLm8OuKhH416azwazV_KA'  # Change this to a random secret key
 
 # OAuth Configuration for Google
 google = oauth.register(
@@ -37,8 +36,8 @@ google = oauth.register(
 
 # User loader for Flask-Login
 @login_manager.user_loader
-def load_user(food_user_id):
-    return FoodUser.query.get(int(food_user_id))
+def load_user(user_id):
+    return FoodUser.query.get(user_id)
 
 class FoodUsers(Resource):
     def get(self):
@@ -130,7 +129,7 @@ class RestaurantsById(Resource):
         restaurant = restaurant.to_dict(only=(
             "id", "name", "rating", "phone_number", "image_url", 
             "reviews.content", "reviews.rating", "reviews.review_date", "reviews.food_user_id",
-            "favorites.food_user.username"
+            "favorites.food_user.username", "menus.restaurant_id", "menus.id", "menus.name"
         ))
         restaurant['favorited_by'] = [fav['food_user']['username'] for fav in restaurant['favorites']]
         del restaurant['favorites']
@@ -160,19 +159,15 @@ class Menus(Resource):
 api.add_resource(Menus, "/menus")
 
 
+
 class Favorites(Resource):
     def post(self):
         # Check if a user is logged in
         if 'food_user_id' not in session:
             return {'error': 'FoodUser not logged in'}, 401
 
-        # Parse the incoming data to get the restaurant_id
-        parser = reqparse.RequestParser()
-        parser.add_argument('restaurant_id', required=True, help="restaurant_id cannot be blank")
-        args = parser.parse_args()
-
         user_id = session['food_user_id']
-        restaurant_id = args['restaurant_id']
+        restaurant_id = request.json.get('restaurant_id')
 
         # Check if the user has already favorited this restaurant
         favorite = Favorite.query.filter_by(food_user_id=user_id, restaurant_id=restaurant_id).first()
@@ -188,6 +183,9 @@ class Favorites(Resource):
         except Exception as e:
             db.session.rollback()
             return {'message': str(e)}, 400
+        
+api.add_resource(Favorites, "/favorites")
+
 
 class FavoritesById(Resource):
     def delete(self, id):
@@ -258,8 +256,8 @@ class CheckSession(Resource):
     def get(self):  
         if "food_user_id" not in session:
             return {"message": "Not Authorized"}, 403
-        if food_user := db.session.get(FoodUser, session["food_user_id"]):
-            return food_user.to_dict(rules=("-email",)), 200
+        if user := db.session.get(FoodUser, session["food_user_id"]):
+            return user.to_dict(rules=("-email",)), 200
         return {"message": "Not Authorized"}, 403
 
 api.add_resource(CheckSession, '/check_session') 
@@ -281,6 +279,7 @@ def google_login():
             db.session.add(food_user)
             db.session.commit()
         food_user=food_user.to_dict()
+        session['food_user_id'] = food_user
         return make_response(food_user, 200)
     return make_response({"message":"this doesnt work"}, 200)
 

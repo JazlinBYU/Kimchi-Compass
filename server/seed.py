@@ -101,20 +101,24 @@ def seed_database():
         # Create menus and assign dishes to restaurants
         dishes = Dish.query.all()
         restaurants = Restaurant.query.all()
-        for i, restaurant in enumerate(restaurants):
+
+        for restaurant in restaurants:
+            # Create lunch and dinner menus for each restaurant
             lunch_menu = Menu(name="Lunch Menu", restaurant_id=restaurant.id)
             dinner_menu = Menu(name="Dinner Menu", restaurant_id=restaurant.id)
             db.session.add(lunch_menu)
             db.session.add(dinner_menu)
 
-            # Assign a mix of unique and common dishes to each menu
-            lunch_dishes = dishes[i: i + 10]  # Select 10 dishes for lunch
-            dinner_dishes = dishes[-(i + 10):]  # Select 10 different dishes for dinner
+            # Randomly assign a subset of dishes to each menu
+            lunch_dishes = sample(dishes, 5)  # Select 5 dishes for lunch
+            dinner_dishes = sample(dishes, 5)  # Select 5 different dishes for dinner
 
+            # Associate dishes with lunch menu
             for dish in lunch_dishes:
                 menu_dish = MenuDish(menu=lunch_menu, dish=dish)
                 db.session.add(menu_dish)
 
+            # Associate dishes with dinner menu
             for dish in dinner_dishes:
                 menu_dish = MenuDish(menu=dinner_menu, dish=dish)
                 db.session.add(menu_dish)
