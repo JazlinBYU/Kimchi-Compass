@@ -96,6 +96,56 @@ class FoodUsersById(Resource):
 
 api.add_resource(FoodUsersById, "/food_users/<int:id>")
 
+class Reviews(Resource):
+    def get(self, id):
+        review = Review.query.get_or_404(id, description=f"Review {id} not found")
+        return review.to_dict(), 200
+
+    def post(self):
+        data = request.get_json()
+        try:
+            new_review = Review(
+                content=data['content'],
+                rating=data['rating'],
+                restaurant_id=data['restaurant_id'],
+                food_user_id=data['food_user_id']
+            )
+            db.session.add(new_review)
+            db.session.commit()
+            return new_review.to_dict(), 201
+        except Exception as e:
+            db.session.rollback()
+            return {'message': str(e)}, 400
+
+    def patch(self, id):
+        review = Review.query.get_or_404(id, description=f"Review {id} not found")
+        try:
+            data = request.get_json()
+            if 'content' in data:
+                review.content = data['content']
+            if 'rating' in data:
+                review.rating = data['rating']
+            # Add other fields as necessary
+
+            db.session.commit()
+            return {'message': 'Review updated successfully'}, 200
+        except Exception as e:
+            db.session.rollback()
+            return {'message': str(e)}, 400
+
+    def delete(self, id):
+        review = Review.query.get_or_404(id, description=f"Review {id} not found")
+        try:
+            db.session.delete(review)
+            db.session.commit()
+            return {}, 204
+        except Exception as e:
+            db.session.rollback()
+            return {'message': str(e)}, 400
+
+api.add_resource(Reviews, '/reviews/<int:id>')
+
+
 class Restaurants(Resource):
     def get(self):
         try:
@@ -191,7 +241,8 @@ class FavoritesById(Resource):
     def delete(self, id):
         try:
             user_id = session['food_user_id']
-            favorite = Favorites.query.filter_by(food_user_id=user_id, restaurant_id=id).first()
+            print(user_id)
+            favorite = Favorite.query.filter_by(food_user_id=user_id, restaurant_id=id).first()
 
             if favorite:
                 db.session.delete(favorite)

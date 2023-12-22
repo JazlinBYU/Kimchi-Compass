@@ -5,7 +5,7 @@ import { UserContext } from "../UserContext"; // Ensure this path is correct
 import { Link } from "react-router-dom";
 
 const RestaurantDetails = () => {
-  const { user } = useContext(UserContext);
+  const user = useContext(UserContext);
   const [newReviewContent, setNewReviewContent] = useState("");
   const [newReviewRating, setNewReviewRating] = useState("");
   const { id } = useParams();
@@ -28,9 +28,8 @@ const RestaurantDetails = () => {
     const user_has_favs = food_users?.find(
       (food_user) => food_user["username"] === user.username
     );
-    if (user_has_favs) {
-      return setHasFavorited(true);
-    }
+    setHasFavorited(user_has_favs);
+    console.log(user_has_favs);
   };
 
   useEffect(() => {
@@ -45,8 +44,10 @@ const RestaurantDetails = () => {
   }, [id, enqueueSnackbar, food_users]);
 
   useEffect(() => {
-    if (user && restaurant.food_users) {
-      check_user_favs();
+    if (user) {
+      if (restaurant.favorited_by?.includes(user.currentUser.username)) {
+        setHasFavorited(true);
+      }
     }
   }, [user, food_users]);
 
@@ -65,6 +66,7 @@ const RestaurantDetails = () => {
       body: JSON.stringify({ restaurant_id: id }),
     })
       .then(() => {
+        favoriteUserList.push(user.currentUser.username);
         setHasFavorited(true);
         enqueueSnackbar("Favorite added successfully!", { variant: "success" });
       })
@@ -74,8 +76,8 @@ const RestaurantDetails = () => {
       });
   };
 
-  const handleDeleteFavorite = () => {
-    const favoriteId = fetch(`/favorites/${favoriteId}`, {
+  const handleDeleteFavorite = (favoriteId) => {
+    fetch(`/favorites/${favoriteId}`, {
       method: "DELETE",
       headers: {},
     })
@@ -85,6 +87,7 @@ const RestaurantDetails = () => {
       })
       .then(() => {
         setHasFavorited(false);
+        console.log(favoriteUserList);
         enqueueSnackbar("Favorite removed successfully!", {
           variant: "success",
         });
