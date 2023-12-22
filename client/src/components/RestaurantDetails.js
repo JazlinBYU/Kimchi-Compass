@@ -5,37 +5,27 @@ import { UserContext } from "../UserContext"; // Ensure this path is correct
 import { Link } from "react-router-dom";
 
 const RestaurantDetails = () => {
-  const user = useContext(UserContext);
-  const { currentUser } = useContext(UserContext);
+  const { currentUser, updateUser } = useContext(UserContext);
   const [newReviewContent, setNewReviewContent] = useState("");
   const [newReviewRating, setNewReviewRating] = useState("");
   const { id } = useParams();
-  const [restaurant, setRestaurant] = useState(""); //useState({});
-  const [newFavorited, setHasFavorited] = useState("");
+  const [restaurant, setRestaurant] = useState({
+    name: "",
+    image_url: "",
+    rating: "",
+    phone_number: "",
+    address: "",
+    reviews: [],
+    favorited_by: [],
+    food_users: [],
+  });
   const { enqueueSnackbar } = useSnackbar();
-  const [review, setReviews] = useState([]);
-
-  const {
-    name,
-    image_url,
-    rating,
-    phone_number,
-    address,
-    reviews,
-    favorites,
-    food_users,
-    // Assuming this is an array of users who have favorited the restaurant
-  } = restaurant;
-
-  const check_user_favs = () => {
-    const user_has_favs = food_users?.find(
-      (food_user) => food_user["username"] === user.username
-    );
-    setHasFavorited(user_has_favs);
-    console.log(user_has_favs);
-  };
 
   useEffect(() => {
+    fetchRestaurantDetails();
+  }, [id]);
+
+  const fetchRestaurantDetails = () => {
     fetch(`/restaurants/${id}`)
       .then((resp) => resp.json())
       .then((restaurantObj) => {
@@ -44,33 +34,24 @@ const RestaurantDetails = () => {
       .catch((error) => {
         enqueueSnackbar(`Error: ${error.message}`, { variant: "error" });
       });
-  }, [id, enqueueSnackbar, food_users]);
-
-  useEffect(() => {
-    if (user) {
-      if (restaurant.favorited_by?.includes(user.currentUser.username)) {
-        setHasFavorited(true);
-      }
-    }
-  }, [user, food_users]);
+  };
 
   const handleSaveFavorite = () => {
-    if (!user) {
+    if (!currentUser) {
       enqueueSnackbar("You must be logged in to add a favorite.", {
         variant: "warning",
       });
       return;
     }
 
-    // Proceed with your fetch request since `user` is defined
     fetch(`/favorites`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ restaurant_id: id }),
     })
+      .then((response) => response.json())
       .then(() => {
-        favoriteUserList.push(user.currentUser.username);
-        setHasFavorited(true);
+        fetchRestaurantDetails(); // Refetch restaurant details
         enqueueSnackbar("Favorite added successfully!", { variant: "success" });
       })
       .catch((error) => {
@@ -79,18 +60,14 @@ const RestaurantDetails = () => {
       });
   };
 
-  const handleDeleteFavorite = (favoriteId) => {
-    fetch(`/favorites/${favoriteId}`, {
+  const handleDeleteFavorite = () => {
+    // Assuming favoriteId is available or retrieved somehow
+    fetch(`/favorites/${id}`, {
       method: "DELETE",
-      headers: {},
     })
-      .then((response) => {
-        if (!response.ok) throw new Error("Failed to remove favorite");
-        return response.json();
-      })
+      .then((response) => response.json())
       .then(() => {
-        setHasFavorited(false);
-        console.log(favoriteUserList);
+        fetchRestaurantDetails(); // Refetch restaurant details
         enqueueSnackbar("Favorite removed successfully!", {
           variant: "success",
         });
@@ -109,33 +86,22 @@ const RestaurantDetails = () => {
       return;
     }
 
-    const parsedRating = parseFloat(newReviewRating);
-
     const reviewData = {
       content: newReviewContent,
-      rating: parsedRating, // Ensure this is a number
+      rating: parseFloat(newReviewRating),
       restaurant_id: id,
       food_user_id: currentUser.id,
     };
 
-    console.log("Review Data being sent:", reviewData); // Debugging log
-
     fetch("/reviews", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(reviewData),
     })
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        }
-        throw new Error("Failed to add review");
-      })
+      .then((response) => response.json())
       .then((addedReview) => {
+        fetchRestaurantDetails(); // Refetch restaurant details
         enqueueSnackbar("Review added successfully!", { variant: "success" });
-        setReviews((currentReviews) => [...currentReviews, addedReview]);
         setNewReviewContent("");
         setNewReviewRating("");
       })
@@ -144,25 +110,26 @@ const RestaurantDetails = () => {
       });
   };
 
-  const reviewList = reviews?.map((review) => (
-    <li key={review.content}>
+  const reviewList = restaurant.reviews.map((review, index) => (
+    <li key={index}>
       {review.content} - {review.rating} stars
     </li>
   ));
 
-  const favoriteUserList = restaurant.favorited_by?.map((username, index) => (
+  const favoriteUserList = restaurant.favorited_by.map((username, index) => (
     <li key={index}>{username}</li>
   ));
 
   return (
     <div className="one_restaurant">
-      <h2>{name}</h2>
-      <img src={image_url} alt={name} />
+      <h2>{restaurant.name}</h2>
+      <img src={restaurant.image_url} alt={restaurant.name} />
       <div className="container">
         <main className="restaurant_details">
-          <p>Rating: {rating}</p>
-          <p>Phone Number: {phone_number}</p>
-          <Link to={`/view-menu/${id}`}>View Menu</Link> <ul>{reviewList}</ul>
+          <p>Rating: {restaurant.rating}</p>
+          <p>Phone Number: {restaurant.phone_number}</p>
+          <Link to={`/view-menu/${id}`}>View Menu</Link>
+          <ul>{reviewList}</ul>
           <form onSubmit={handleAddReview}>
             <textarea
               value={newReviewContent}
@@ -179,8 +146,8 @@ const RestaurantDetails = () => {
             />
             <button type="submit">Submit Review</button>
           </form>
-          {newFavorited ? (
-            <button onClick={() => handleDeleteFavorite(restaurant.id)}>
+          {restaurant.favorited_by.includes(currentUser?.username) ? (
+            <button onClick={() => handleDeleteFavorite()}>
               Remove Favorite
             </button>
           ) : (
