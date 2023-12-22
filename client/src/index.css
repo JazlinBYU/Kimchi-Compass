@@ -7,14 +7,15 @@
 
 :root {
   --light-purp: #c8bf96;
-  --med1-purp: #5f422e;
+  --med1-purp: #7d583f;
   --med2-purp: #1d3235;
   --dark-purp: #a08dca;
 
-  --bg-color: #301a1ac7;
+  background: url(https://images.unsplash.com/photo-1675765765869-dcf7da360fd1?q=80&w=3472&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)
+    fixed no-repeat;
+  background-size: cover;
   --main-txt-color: #b6af33;
 
-  background: var(--bg-color);
   color: var(--main-txt-color);
 }
 
@@ -25,14 +26,38 @@
 }
 
 #header {
-  height: 175px;
-  width: 100%;
-  padding: 2rem;
-  background-color: var(--med1-purp);
+  background: url(https://images.unsplash.com/photo-1506968430777-bf7784a87f23?q=80&w=3542&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)
+    center no-repeat;
+  background-size: cover;
+  color: rgb(255, 252, 82);
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Add shadow for depth */
+  padding: 10px 20px;
+  height: 200px;
+}
+
+#header .logo {
+  width: 350px; /* adjust as needed */
+  height: 200px;
+}
+
+/* Navigation Menu */
+#header nav {
+  display: flex;
+  align-items: flex-start;
+}
+
+#header nav a {
+  color: rgb(252, 246, 45);
+  text-decoration: none;
+  padding: 20px 20px;
+  transition: background 0.3s ease;
+  margin-inline-start: auto;
+  min-width: fit-content;
+}
+
+#header nav a:hover {
+  background-color: #555;
 }
 
 .logo {
@@ -41,7 +66,7 @@
   height: 120px; /* Set a fixed height for your logo */
   display: grid;
   padding-top: 1%;
-  margin-right: 600px; /* Add some margin to the right */
+  margin-right: 100px; /* Add some margin to the right */
   margin-left: 650px;
 }
 

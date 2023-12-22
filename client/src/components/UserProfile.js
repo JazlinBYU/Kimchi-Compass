@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { UserContext } from "../UserContext";
-import RestaurantCard from "./RestaurantCard"; // Adjust import path as needed
+import RestaurantCard from "./RestaurantCard";
 
 const UserProfile = () => {
   const { currentUser, logout } = useContext(UserContext);
@@ -13,7 +13,7 @@ const UserProfile = () => {
       fetch(`/food_users/${currentUser.id}`)
         .then((response) => response.json())
         .then((data) => {
-          console.log(data); // Log to see the structure
+          console.log(data);
           setUserInfo(data);
         })
         .catch((error) => console.error("Error:", error));
@@ -21,7 +21,6 @@ const UserProfile = () => {
   }, [currentUser]);
 
   const deleteProfile = () => {
-    // Confirm with the user before deletion
     if (!window.confirm("Are you sure you want to delete your profile?")) {
       return;
     }
@@ -38,7 +37,6 @@ const UserProfile = () => {
           navigate("/");
           alert("Your profile has been successfully deleted.");
         } else {
-          // Handle non-ok responses
           response.json().then((errorData) => {
             alert(`Failed to delete profile: ${errorData.message}`);
           });

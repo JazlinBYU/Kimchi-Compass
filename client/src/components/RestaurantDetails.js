@@ -145,7 +145,7 @@ const RestaurantDetails = () => {
   };
 
   const reviewList = reviews?.map((review) => (
-    <li key={review.id}>
+    <li key={review.content}>
       {review.content} - {review.rating} stars
     </li>
   ));
@@ -162,9 +162,7 @@ const RestaurantDetails = () => {
         <main className="restaurant_details">
           <p>Rating: {rating}</p>
           <p>Phone Number: {phone_number}</p>
-          <Link to={`/view-menu/${id}`}>View Menu</Link>{" "}
-          {/* Adjust the path as needed */}
-          <ul>{reviewList}</ul>
+          <Link to={`/view-menu/${id}`}>View Menu</Link> <ul>{reviewList}</ul>
           <form onSubmit={handleAddReview}>
             <textarea
               value={newReviewContent}

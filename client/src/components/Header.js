@@ -20,26 +20,20 @@ const Header = ({ user, updateUser }) => {
 
   return (
     <div id="header">
-      <div className="App-header">
-        <NavLink to={"/"}>
-          <img src="/logo12.png" className="logo" alt="Kimchi-Compass Logo" />
-        </NavLink>
+      <NavLink to={"/"}>
+        <img src="/logo12.png" className="logo" alt="Kimchi-Compass Logo" />
+      </NavLink>
+      <nav>
         {user ? (
-          <div className="container">
-            <Link to={`/profile/${user.id}`}>
-              <button>Profile</button>
-            </Link>
-            <Link to="/add-restaurant">
-              <button>Add Restaurant</button>
-            </Link>
+          <>
+            <Link to={`/profile/${user.id}`}>Profile</Link>
+            <Link to="/add-restaurant">Add Restaurant</Link>
             <button onClick={handleLogout}>Logout</button>
-          </div>
+          </>
         ) : (
-          <Link to={"/register"}>
-            <button>Login</button>
-          </Link>
+          <Link to={"/register"}>Login</Link>
         )}
-      </div>
+      </nav>
     </div>
   );
 };

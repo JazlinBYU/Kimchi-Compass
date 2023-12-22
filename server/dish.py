@@ -19,8 +19,8 @@ class Dish(db.Model, SerializerMixin):
     def validate_name(self, key, name):
         if not name:
             raise ValueError('Dish name is required')
-        if len(name) < 5:
-            raise ValueError('Dish name must be at least 5 characters')
+        if len(name) < 2:
+            raise ValueError('Dish name must be at least 2 characters')
         return name
 
     @validates('description')
