@@ -2,6 +2,9 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 const Card = ({ restaurant }) => {
+  if (!restaurant) {
+    return <div>Restaurant information is not available.</div>;
+  }
   const { id, image_url, name, rating, phone_number } = restaurant;
 
   return (

@@ -11,16 +11,12 @@ const UserProfile = () => {
   useEffect(() => {
     if (currentUser) {
       fetch(`/food_users/${currentUser.id}`)
-        .then((response) => {
-          if (response.ok) {
-            response.json().then(setUserInfo);
-          } else {
-            // Handle errors
-          }
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data); // Log to see the structure
+          setUserInfo(data);
         })
-        .catch((error) => {
-          // Handle network error
-        });
+        .catch((error) => console.error("Error:", error));
     }
   }, [currentUser]);
 
@@ -54,8 +50,8 @@ const UserProfile = () => {
       });
   };
 
-  const favoriteRestaurants = userInfo.favorites?.map((favorite) => (
-    <RestaurantCard key={favorite.id} {...favorite.restaurant} />
+  const favoriteRestaurants = userInfo.restaurants?.map((restaurant) => (
+    <RestaurantCard key={restaurant.id} restaurant={restaurant} />
   ));
 
   return (
