@@ -14,7 +14,7 @@ class MenuDish(db.Model, SerializerMixin):
     menu = db.relationship('Menu', back_populates='menu_dishes')
 
     # Serialization
-    serialize_only = ("id", "dish_id", "menu_id", "dish", "menu")
+    serialize_only = ("id", "dish_id", "menu_id", "dish", "-dish.menu_dishes")
 
     def __repr__(self):
         return f"<MenuDish {self.id}: Dish {self.dish_id} - Menu {self.menu_id}>"

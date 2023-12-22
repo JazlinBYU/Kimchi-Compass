@@ -97,9 +97,13 @@ class FoodUsersById(Resource):
 api.add_resource(FoodUsersById, "/food_users/<int:id>")
 
 class Reviews(Resource):
-    def get(self, id):
-        review = Review.query.get_or_404(id, description=f"Review {id} not found")
-        return review.to_dict(), 200
+    def get(self):
+        restaurant_id = request.args.get('restaurant_id')
+        if restaurant_id:
+            reviews = Review.query.filter_by(restaurant_id=restaurant_id).all()
+        else:
+            reviews = Review.query.all()
+        return [review.to_dict() for review in reviews], 200
 
     def post(self):
         data = request.get_json()
@@ -143,7 +147,7 @@ class Reviews(Resource):
             db.session.rollback()
             return {'message': str(e)}, 400
 
-api.add_resource(Reviews, '/reviews/<int:id>')
+api.add_resource(Reviews, '/reviews', '/reviews/<int:id>')
 
 
 class Restaurants(Resource):
@@ -187,27 +191,38 @@ class RestaurantsById(Resource):
 
 api.add_resource(RestaurantsById, "/restaurants/<int:id>")
 
-class Menus(Resource):
-    def get(self):
-        try:
-            menus = [menu.to_dict() for menu in Menu.query.all()]
-            return menus, 200
-        except Exception as e:
-            return {'message': str(e)}, 400
+# class Menus(Resource):
+#     def get(self):
+#         try:
+#             menus = [menu.to_dict() for menu in Menu.query.all()]
+#             return menus, 200
+#         except Exception as e:
+#             return {'message': str(e)}, 400
 
-    def post(self):
-        try:
-            data = request.get_json()
-            new_menu = Menu(name=data['name'], restaurant_id=data['restaurant_id'])
-            db.session.add(new_menu)
-            db.session.commit()
-            return new_menu.to_dict(), 201
-        except Exception as e:
-            db.session.rollback()
-            return {'message': str(e)}, 400
+#     def post(self):
+#         try:
+#             data = request.get_json()
+#             new_menu = Menu(name=data['name'], restaurant_id=data['restaurant_id'])
+#             db.session.add(new_menu)
+#             db.session.commit()
+#             return new_menu.to_dict(), 201
+#         except Exception as e:
+#             db.session.rollback()
+#             return {'message': str(e)}, 400
 
-api.add_resource(Menus, "/menus")
+# api.add_resource(Menus, "/menus")
 
+
+@app.route('/menus')
+def get_menus():
+    restaurant_id = request.args.get('restaurant_id')
+    if restaurant_id:
+        menus = Menu.query.filter_by(restaurant_id=restaurant_id).all()
+        # Serialize and return menus along with dish details
+    else:
+        menus = Menu.query.all()
+        # Serialize and return all menus
+    return jsonify([menu.to_dict() for menu in menus])
 
 
 class Favorites(Resource):

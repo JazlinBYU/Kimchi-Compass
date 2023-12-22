@@ -6,12 +6,15 @@ import { Link } from "react-router-dom";
 
 const RestaurantDetails = () => {
   const user = useContext(UserContext);
+  const { currentUser } = useContext(UserContext);
   const [newReviewContent, setNewReviewContent] = useState("");
   const [newReviewRating, setNewReviewRating] = useState("");
   const { id } = useParams();
   const [restaurant, setRestaurant] = useState(""); //useState({});
   const [newFavorited, setHasFavorited] = useState("");
   const { enqueueSnackbar } = useSnackbar();
+  const [review, setReviews] = useState([]);
+
   const {
     name,
     image_url,
@@ -99,19 +102,23 @@ const RestaurantDetails = () => {
 
   const handleAddReview = (event) => {
     event.preventDefault();
-    if (!user) {
+    if (!currentUser) {
       enqueueSnackbar("You must be logged in to add a review.", {
         variant: "error",
       });
       return;
     }
 
+    const parsedRating = parseFloat(newReviewRating);
+
     const reviewData = {
       content: newReviewContent,
-      rating: newReviewRating,
+      rating: parsedRating, // Ensure this is a number
       restaurant_id: id,
-      food_user_id: user.id, // Assuming 'user' state has user ID
+      food_user_id: currentUser.id,
     };
+
+    console.log("Review Data being sent:", reviewData); // Debugging log
 
     fetch("/reviews", {
       method: "POST",
@@ -128,7 +135,9 @@ const RestaurantDetails = () => {
       })
       .then((addedReview) => {
         enqueueSnackbar("Review added successfully!", { variant: "success" });
-        // Update local state to show new review, or you could re-fetch the restaurant details
+        setReviews((currentReviews) => [...currentReviews, addedReview]);
+        setNewReviewContent("");
+        setNewReviewRating("");
       })
       .catch((error) => {
         enqueueSnackbar(error.message, { variant: "error" });

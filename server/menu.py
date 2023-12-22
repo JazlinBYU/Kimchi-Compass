@@ -20,7 +20,7 @@ class Menu(db.Model, SerializerMixin):
     dishes = association_proxy('menu_dishes', 'dish')
 
     # serialization
-    serialize_only = ("id", "name", "restaurant_id", "dishes","-dishes.menus", "menu_dishes", "-menu_dishes.menu")
+    serialize_only = ("id", "name", "restaurant_id", "restaurant", "-restaurant.menus", "menu_dishes", "-menu_dishes.")
     
 
     def __repr__(self):

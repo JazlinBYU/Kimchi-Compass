@@ -11,20 +11,23 @@ class Review(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.String, nullable=False)
     rating = db.Column(db.Float)
-    review_date = db.Column(db.DateTime, default=datetime.utcnow)  # Optional date field
+    review_date = db.Column(db.DateTime, default=datetime.utcnow)
     food_user_id = db.Column(db.Integer, db.ForeignKey('food_users.id'), nullable=False) 
     restaurant_id = db.Column(db.Integer, db.ForeignKey('restaurants.id'), nullable=False)
 
     # Relationships
-
     food_user = db.relationship('FoodUser', back_populates='reviews')
     restaurant = db.relationship('Restaurant', back_populates='reviews')
 
     # Serialization
-    serialize_only = ("id", "content", "rating", "food_user","-food_user.reviews", "restaurant","-restaurant.reviews", "review_date")
+    # Exclude the entire food_user and restaurant objects to prevent recursion
+    serialize_only = ("id", "content", "rating", "review_date", "food_user_id", "restaurant_id")
 
     def __repr__(self):
         return f"<Review {self.id}: {self.content}: {self.rating}>"
+
+    # Validation methods...
+
 
     # Validation
     @validates("content")

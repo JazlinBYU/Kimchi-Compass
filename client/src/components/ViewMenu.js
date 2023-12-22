@@ -1,16 +1,17 @@
+// ViewMenu.js
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 const ViewMenu = () => {
-  const { id } = useParams();
-  const [menus, setMenus] = useState(null);
+  const { id } = useParams(); // Restaurant ID from URL
+  const [menus, setMenus] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`/menus/${id}`) // Adjust this endpoint as needed
+    fetch(`/menus?restaurant_id=${id}`) // Fetch menus for the specific restaurant
       .then((response) => response.json())
       .then((data) => {
-        setMenus(data.menus); // Extracting menus array from the response
+        setMenus(data); // Assuming the backend sends the filtered menus
         setIsLoading(false);
       })
       .catch((error) => {
@@ -23,18 +24,22 @@ const ViewMenu = () => {
     return <div>Loading menus...</div>;
   }
 
-  if (!Array.isArray(menus)) {
-    return <div>Menu data is not available.</div>;
-  }
-
   return (
     <div>
       <h2>Menu</h2>
-      <ul>
-        {menus.map((menu) => (
-          <li key={menu.id}>{menu.name}</li>
-        ))}
-      </ul>
+      {menus.map((menu) => (
+        <div key={menu.id}>
+          <h3>{menu.name}</h3>
+          <ul>
+            {menu.menu_dishes.map((menuDish) => (
+              <li key={menuDish.id}>
+                <strong>{menuDish.dish.name}</strong> -{" "}
+                {menuDish.dish.description} - ${menuDish.dish.price}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
     </div>
   );
 };
