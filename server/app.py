@@ -183,7 +183,7 @@ class RestaurantsById(Resource):
         restaurant = restaurant.to_dict(only=(
             "id", "name", "rating", "phone_number", "image_url", 
             "reviews.content", "reviews.rating", "reviews.review_date", "reviews.food_user_id",
-            "favorites.food_user.username", "menus.restaurant_id", "menus.id", "menus.name"
+            "favorites.food_user.username", "menus.restaurant_id", "menus.id", "menus.name", "reviews.id"
         ))
         restaurant['favorited_by'] = [fav['food_user']['username'] for fav in restaurant['favorites']]
         del restaurant['favorites']
