@@ -1,21 +1,19 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
+import { UserContext } from "../UserContext"; // Adjust the import path as needed
 
-const Header = ({ user, updateUser }) => {
+const Header = () => {
+  const { currentUser, updateUser } = useContext(UserContext);
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
 
   const handleLogout = () => {
-    fetch("/logout", { method: "DELETE" })
-      .then(() => {
-        updateUser(null);
-        navigate("/");
-        enqueueSnackbar("Logged out successfully", { variant: "success" });
-      })
-      .catch((err) => {
-        enqueueSnackbar("Logout failed: " + err.message, { variant: "error" });
-      });
+    // We can use the logout function from the context instead of redefining it
+    // Assuming that the logout function from the context already handles navigation and snackbars
+    currentUser.logout().catch((err) => {
+      enqueueSnackbar("Logout failed: " + err.message, { variant: "error" });
+    });
   };
 
   return (
@@ -24,9 +22,9 @@ const Header = ({ user, updateUser }) => {
         <img src="/logo12.png" className="logo" alt="Kimchi-Compass Logo" />
       </NavLink>
       <nav>
-        {user ? (
+        {currentUser ? (
           <>
-            <Link to={`/profile/${user.id}`}>Profile</Link>
+            <Link to={`/profile/${currentUser.id}`}>Profile</Link>
             <Link to="/add-restaurant">Add Restaurant</Link>
             <button onClick={handleLogout}>Logout</button>
           </>

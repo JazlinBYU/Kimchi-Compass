@@ -4,24 +4,49 @@ import { useNavigate, useOutletContext } from "react-router-dom";
 import * as Yup from "yup";
 
 const FormComp = () => {
-  const { user, updateUser, setAlertMessage, handleSnackType } =
-    useOutletContext();
+  const outletContext = useOutletContext();
   const [userInfo, setUserInfo] = useState({});
   const navigate = useNavigate();
 
+  // Moved the check for 'outletContext' inside useEffect
   useEffect(() => {
-    if (user) {
-      fetch(`/food_users/${user.id}`)
-        .then((resp) => resp.json())
-        .then((data) => {
-          setUserInfo(data);
-        })
-        .catch((err) => {
-          handleSnackType("error");
-          setAlertMessage(err.message);
-        });
+    if (outletContext) {
+      const { user, setAlertMessage, handleSnackType } = outletContext;
+
+      if (user) {
+        fetch(`/food_users/${user.id}`)
+          .then((resp) => resp.json())
+          .then((data) => {
+            setUserInfo(data);
+          })
+          .catch((err) => {
+            handleSnackType("error");
+            setAlertMessage(err.message);
+          });
+      }
     }
-  }, [user, setAlertMessage, handleSnackType]);
+  }, [outletContext]);
+
+  const [loadingTimeout, setLoadingTimeout] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoadingTimeout(true);
+    }, 5000); // Set timeout for 5 seconds
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Modify the conditional rendering logic
+  if (!outletContext || loadingTimeout) {
+    return (
+      <div>
+        {loadingTimeout ? "Loading timeout, please try again." : "Loading..."}
+      </div>
+    );
+  }
+
+  const { user, updateUser, setAlertMessage, handleSnackType } = outletContext;
 
   const handleSubmit = (values) => {
     const url = user ? `/food_users/${user.id}` : "/food_users";
