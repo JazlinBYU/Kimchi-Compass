@@ -9,6 +9,7 @@ const RestaurantDetails = () => {
   const [newReviewContent, setNewReviewContent] = useState("");
   const [newReviewRating, setNewReviewRating] = useState("");
   const { id } = useParams();
+  const [editingReview, setEditingReview] = useState(null); // For tracking the review being edited
   const [restaurant, setRestaurant] = useState({
     name: "",
     image_url: "",
@@ -77,10 +78,30 @@ const RestaurantDetails = () => {
       });
   };
 
-  const handleAddReview = (event) => {
+  const handleEditReview = (review) => {
+    setEditingReview(review);
+    setNewReviewContent(review.content);
+    setNewReviewRating(review.rating);
+  };
+
+  const handleDeleteReview = (reviewId) => {
+    fetch(`/reviews/${reviewId}`, { method: "DELETE" })
+      .then((response) => {
+        if (!response.ok) throw new Error("Failed to delete review");
+        fetchRestaurantDetails(); // Refetch restaurant details
+        enqueueSnackbar("Review deleted successfully!", {
+          variant: "success",
+        });
+      })
+      .catch((error) => {
+        enqueueSnackbar(error.message, { variant: "error" });
+      });
+  };
+
+  const handleAddOrEditReview = (event) => {
     event.preventDefault();
     if (!currentUser) {
-      enqueueSnackbar("You must be logged in to add a review.", {
+      enqueueSnackbar("You must be logged in to add or edit a review.", {
         variant: "error",
       });
       return;
@@ -93,17 +114,28 @@ const RestaurantDetails = () => {
       food_user_id: currentUser.id,
     };
 
-    fetch("/reviews", {
-      method: "POST",
+    const method = editingReview ? "PATCH" : "POST";
+    const endpoint = editingReview
+      ? `/reviews/${editingReview.id}`
+      : "/reviews";
+
+    fetch(endpoint, {
+      method,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(reviewData),
     })
       .then((response) => response.json())
-      .then((addedReview) => {
+      .then((updatedOrAddedReview) => {
         fetchRestaurantDetails(); // Refetch restaurant details
-        enqueueSnackbar("Review added successfully!", { variant: "success" });
+        enqueueSnackbar(
+          editingReview
+            ? "Review updated successfully!"
+            : "Review added successfully!",
+          { variant: "success" }
+        );
         setNewReviewContent("");
         setNewReviewRating("");
+        setEditingReview(null);
       })
       .catch((error) => {
         enqueueSnackbar(error.message, { variant: "error" });
@@ -113,6 +145,12 @@ const RestaurantDetails = () => {
   const reviewList = restaurant.reviews.map((review, index) => (
     <li key={index}>
       {review.content} - {review.rating} stars
+      {currentUser && currentUser.id === review.food_user_id && (
+        <>
+          <button onClick={() => handleEditReview(review)}>Edit</button>
+          <button onClick={() => handleDeleteReview(review.id)}>Delete</button>
+        </>
+      )}
     </li>
   ));
 
@@ -130,7 +168,7 @@ const RestaurantDetails = () => {
           <p>Phone Number: {restaurant.phone_number}</p>
           <Link to={`/view-menu/${id}`}>View Menu</Link>
           <ul>{reviewList}</ul>
-          <form onSubmit={handleAddReview}>
+          <form onSubmit={handleAddOrEditReview}>
             <textarea
               value={newReviewContent}
               onChange={(e) => setNewReviewContent(e.target.value)}
@@ -144,7 +182,9 @@ const RestaurantDetails = () => {
               min="0"
               max="5"
             />
-            <button type="submit">Submit Review</button>
+            <button type="submit">
+              {editingReview ? "Update Review" : "Submit Review"}
+            </button>
           </form>
           {restaurant.favorited_by.includes(currentUser?.username) ? (
             <button onClick={() => handleDeleteFavorite()}>
