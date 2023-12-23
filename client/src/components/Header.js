@@ -4,16 +4,19 @@ import { useSnackbar } from "notistack";
 import { UserContext } from "../UserContext"; // Adjust the import path as needed
 
 const Header = () => {
-  const { currentUser, updateUser } = useContext(UserContext);
+  const { currentUser, logout } = useContext(UserContext); // Destructure logout from context
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
 
   const handleLogout = () => {
-    // We can use the logout function from the context instead of redefining it
-    // Assuming that the logout function from the context already handles navigation and snackbars
-    currentUser.logout().catch((err) => {
-      enqueueSnackbar("Logout failed: " + err.message, { variant: "error" });
-    });
+    logout() // Call the logout function from the context
+      .then(() => {
+        navigate("/");
+        enqueueSnackbar("Logged out successfully", { variant: "success" });
+      })
+      .catch((err) => {
+        enqueueSnackbar("Logout failed: " + err.message, { variant: "error" });
+      });
   };
 
   return (
