@@ -9,6 +9,8 @@ const RestaurantDetails = () => {
   const { currentUser } = useContext(UserContext);
   const { id } = useParams();
   const [editingReview, setEditingReview] = useState(null);
+  const [isEdit, setIsEdit] = useState(false);
+
   const [restaurant, setRestaurant] = useState({
     name: "",
     image_url: "",
@@ -81,8 +83,15 @@ const RestaurantDetails = () => {
   };
 
   const handleEditReview = (review) => {
-    setEditingReview(review);
-    setShowReviewForm(true);
+    setIsEdit(true); // Indicates we're in edit mode
+    setEditingReview(review); // Set the current review we're editing
+    setShowReviewForm(true); // Show the review form
+  };
+
+  const handleCancelEdit = () => {
+    setIsEdit(false);
+    setEditingReview(null);
+    setShowReviewForm(false);
   };
 
   const handleDeleteReview = (reviewId) => {
@@ -103,7 +112,7 @@ const RestaurantDetails = () => {
 
   const reviewSchema = Yup.object().shape({
     content: Yup.string().required("Content is required"),
-    rating: Yup.number().min(0).max(5).required("Rating is required"),
+    rating: Yup.number().min(1).max(5).required("Rating is required"),
   });
 
   const handleAddOrEditReview = (values, { setSubmitting }) => {
@@ -152,7 +161,10 @@ const RestaurantDetails = () => {
             : "Review added successfully!",
           { variant: "success" }
         );
+        // Reset the editing states after successful submission
         setEditingReview(null);
+        setIsEdit(false); // Add this line
+        setShowReviewForm(false); // If you want to close the form as well
       })
       .catch((error) => {
         enqueueSnackbar(error.message, { variant: "error" });
@@ -165,13 +177,24 @@ const RestaurantDetails = () => {
       {review.content} - {review.rating} stars
       {currentUser && currentUser.id === review.food_user_id && (
         <>
-          <button onClick={() => handleEditReview(review)}>Edit</button>
-          <button onClick={() => handleDeleteReview(review.id)}>Delete</button>
+          {isEdit && editingReview && editingReview.id === review.id ? (
+            <>
+              {/* "Edit" has been clicked, "Delete" and "Cancel" are now shown */}
+              <button onClick={() => handleDeleteReview(review.id)}>
+                Delete
+              </button>
+              <button onClick={handleCancelEdit}>Cancel</button>
+            </>
+          ) : (
+            <>
+              {/* Not in edit mode, show "Edit" button */}
+              <button onClick={() => handleEditReview(review)}>Edit</button>
+            </>
+          )}
         </>
       )}
     </li>
   ));
-
   const toggleReviewForm = () => {
     if (
       editingReview ||
@@ -205,19 +228,14 @@ const RestaurantDetails = () => {
                 <button onClick={handleSaveFavorite}>Add to Favorites</button>
               )}
 
-              {restaurant.reviews.some(
-                (review) => review.food_user_id === currentUser.id
-              ) ? (
-                <button onClick={() => setShowReviewForm(!showReviewForm)}>
-                  {showReviewForm ? "Cancel" : "Edit Review"}
-                </button>
-              ) : (
-                !showReviewForm && (
+              {!showReviewForm &&
+                !restaurant.reviews.some(
+                  (review) => review.food_user_id === currentUser.id
+                ) && (
                   <button onClick={() => setShowReviewForm(true)}>
                     Review Restaurant
                   </button>
-                )
-              )}
+                )}
             </>
           )}
 
@@ -244,8 +262,8 @@ const RestaurantDetails = () => {
                   <Field
                     name="rating"
                     type="number"
-                    placeholder="Rating (0-5)"
-                    min="0"
+                    placeholder="Rating (1-5)"
+                    min="1"
                     max="5"
                   />
                   <ErrorMessage name="rating" component="div" />
