@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import RestaurantCard from "./RestaurantCard";
 import SearchFilter from "./SearchFilter";
 
-const Home = () => {
+const Restaurants = () => {
   const [restaurants, setRestaurants] = useState([]);
   const [filteredRestaurants, setFilteredRestaurants] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -75,4 +75,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default Restaurants;

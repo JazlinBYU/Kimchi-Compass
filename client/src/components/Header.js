@@ -25,6 +25,7 @@ const Header = () => {
         <img src="/logo12.png" className="logo" alt="Kimchi-Compass Logo" />
       </NavLink>
       <nav>
+        <Link to="/restaurants">Restaurants</Link>
         {currentUser ? (
           <>
             <Link to={`/profile/${currentUser.id}`}>Profile</Link>

@@ -30,6 +30,19 @@ export const UserProvider = ({ children }) => {
     setCurrentUser(newUser);
   };
 
+  useEffect(() => {
+    if (currentUser && currentUser.id) {
+      fetch(`/food_users/${currentUser.id}`)
+        .then((response) => response.json())
+        .then((data) => {
+          setCurrentUser(data);
+        })
+        .catch((error) =>
+          console.error("Failed to fetch updated user data", error)
+        );
+    }
+  }, [currentUser?.id]);
+
   const logout = async () => {
     const response = await fetch("/logout", {
       method: "DELETE", // Change to DELETE if that's what the server expects

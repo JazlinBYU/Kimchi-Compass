@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../UserContext";
 import { Formik, Form, Field, ErrorMessage } from "formik";
@@ -9,6 +9,7 @@ const EditProfile = () => {
   const { currentUser, updateUser } = useContext(UserContext);
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
+  const [isUpdated, setIsUpdated] = useState(false);
 
   const validationSchema = Yup.object().shape({
     username: Yup.string()
@@ -16,11 +17,11 @@ const EditProfile = () => {
       .min(3, "Username must be at least 3 characters long"),
     email: Yup.string().email("Invalid email").required("Email is required"),
     currentPassword: Yup.string().min(
-      8,
+      3,
       "Current password must be at least 8 characters long"
     ),
     newPassword: Yup.string().min(
-      8,
+      3,
       "New password must be at least 8 characters long"
     ),
     confirmPassword: Yup.string().oneOf(
@@ -29,7 +30,7 @@ const EditProfile = () => {
     ),
   });
 
-  const handleFormSubmit = (values, { setSubmitting, resetForm }) => {
+  const handleFormSubmit = (values, { setSubmitting }) => {
     if (
       values.currentPassword &&
       values.currentPassword === values.newPassword
@@ -59,25 +60,31 @@ const EditProfile = () => {
     })
       .then((response) => {
         if (!response.ok) {
-          // Parse the JSON to get the error message if the response is not ok
           return response.json().then((data) => {
             throw new Error(data.message);
           });
         }
         return response.json();
       })
-      .then((updatedUser) => {
-        updateUser(updatedUser);
+      .then((UserContext) => {
+        updateUser(UserContext);
+        setIsUpdated(true); // Set the updated flag
         enqueueSnackbar("Profile updated successfully!", {
           variant: "success",
         });
-        navigate(`/profile/${currentUser.id}`);
       })
       .catch((error) => {
         enqueueSnackbar(error.message, { variant: "error" });
       })
       .finally(() => setSubmitting(false));
   };
+  useEffect(() => {
+    if (isUpdated) {
+      navigate(`/profile/${currentUser.id}`);
+    }
+  }, [isUpdated, currentUser, navigate]);
+
+  console.log(currentUser);
 
   return (
     <div className="edit-profile">
