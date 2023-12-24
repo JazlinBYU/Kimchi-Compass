@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../UserContext";
 import { Formik, Form, Field, ErrorMessage } from "formik";
@@ -23,15 +23,9 @@ const EditProfile = () => {
       8,
       "New password must be at least 8 characters long"
     ),
-    confirmPassword: Yup.string().test(
-      "password-match",
-      "Passwords must match",
-      function (value) {
-        if (this.parent.newPassword) {
-          return this.parent.newPassword === value;
-        }
-        return true;
-      }
+    confirmPassword: Yup.string().oneOf(
+      [Yup.ref("newPassword"), null],
+      "Passwords must match"
     ),
   });
 
@@ -51,13 +45,11 @@ const EditProfile = () => {
     const payload = {
       username: values.username,
       email: values.email,
-      // Only include password fields in the request if they are filled
-      ...(values.newPassword && {
-        currentPassword: values.currentPassword,
-        newPassword: values.newPassword,
-      }),
+      currentPassword: values.currentPassword,
+      newPassword: values.newPassword,
     };
 
+    // API call
     fetch(`/food_users/${currentUser.id}`, {
       method: "PATCH",
       headers: {
@@ -67,7 +59,10 @@ const EditProfile = () => {
     })
       .then((response) => {
         if (!response.ok) {
-          throw new Error("Profile update failed");
+          // Parse the JSON to get the error message if the response is not ok
+          return response.json().then((data) => {
+            throw new Error(data.message);
+          });
         }
         return response.json();
       })

@@ -1,11 +1,9 @@
 # user.py
+from flask_login import UserMixin
 from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy.orm import validates
-from flask_login import UserMixin
-from werkzeug.security import generate_password_hash
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.hybrid import hybrid_property
-
 
 from config import db, bcrypt
 
@@ -32,6 +30,9 @@ class FoodUser(db.Model, UserMixin, SerializerMixin):
     def __repr__(self):
         return f"<FoodUser {self.id}: {self.username}>"
 
+
+    _password_hash = db.Column(db.String(128))
+
     @validates("username")
     def validate_username(self, _, username):
         if not isinstance(username, str):
@@ -40,26 +41,13 @@ class FoodUser(db.Model, UserMixin, SerializerMixin):
             raise ValueError("Username must be at least 1 characters")
         return username
 
-    # @validates('email')
-    # def validate_email(self, key, email):
-    #     if not email:
-    #         raise ValueError('Email is required')
-    #     if len(email) > 100:
-    #         raise ValueError('Email must be at most 100 characters')
-    #     if '@' not in email or '.' not in email:
-    #         raise ValueError('Invalid email address')
-    #     return email
-
     @hybrid_property
     def password_hash(self):
-        # return self._password_hash
         raise AttributeError("Password hashes are super secret!")
 
     @password_hash.setter
     def password_hash(self, new_password):
-        hashed_password = bcrypt.generate_password_hash(new_password).decode("utf-8")
-        self._password_hash = hashed_password
+        self._password_hash = bcrypt.generate_password_hash(new_password).decode('utf-8')
 
     def authenticate(self, password_to_check):
         return bcrypt.check_password_hash(self._password_hash, password_to_check)
- 

@@ -1,10 +1,9 @@
 
-from flask import Flask, jsonify, request, redirect, url_for, session, make_response
+from flask import jsonify, request, session, make_response
 from flask_restful import Resource
-from werkzeug.exceptions import NotFound
-from werkzeug.security import check_password_hash
 from authlib.integrations.flask_client import OAuth
-from flask_login import LoginManager, login_user, logout_user, UserMixin, login_required
+from flask_login import LoginManager
+
 from config import app, db, api, bcrypt
 
 # Import your model files
@@ -71,17 +70,18 @@ class FoodUsersById(Resource):
         food_user = FoodUser.query.get_or_404(id, description=f"FoodUser {id} not found")
         try:
             data = request.get_json()
-            # Update the user's attributes
             if 'username' in data:
                 food_user.username = data['username']
             if 'email' in data:
                 food_user.email = data['email'] 
-            # Add other fields as necessary
+            if 'newPassword' in data and 'currentPassword' in data:
+                if not food_user.authenticate(data['currentPassword']):
+                    return {'message': 'Current password is incorrect'}, 400
+                food_user.password_hash = data['newPassword']
 
             db.session.commit()
             return {'message': 'User updated successfully'}, 200
         except Exception as e:
-            db.session.rollback()
             return {'message': str(e)}, 400
 
     def delete(self, id):
@@ -191,28 +191,6 @@ class RestaurantsById(Resource):
 
 api.add_resource(RestaurantsById, "/restaurants/<int:id>")
 
-# class Menus(Resource):
-#     def get(self):
-#         try:
-#             menus = [menu.to_dict() for menu in Menu.query.all()]
-#             return menus, 200
-#         except Exception as e:
-#             return {'message': str(e)}, 400
-
-#     def post(self):
-#         try:
-#             data = request.get_json()
-#             new_menu = Menu(name=data['name'], restaurant_id=data['restaurant_id'])
-#             db.session.add(new_menu)
-#             db.session.commit()
-#             return new_menu.to_dict(), 201
-#         except Exception as e:
-#             db.session.rollback()
-#             return {'message': str(e)}, 400
-
-# api.add_resource(Menus, "/menus")
-
-
 @app.route('/menus')
 def get_menus():
     restaurant_id = request.args.get('restaurant_id')
@@ -269,6 +247,27 @@ class FavoritesById(Resource):
         except Exception as e:
             db.session.rollback()
             return {'message': str(e)}, 400
+    def patch(self, id):
+        food_user = FoodUser.query.get_or_404(id, description=f"FoodUser {id} not found")
+        data = request.get_json()
+        try:
+            # Verify current password if attempting to change password
+            if 'newPassword' in data:
+                if 'currentPassword' not in data or not food_user.authenticate(data['currentPassword']):
+                    return jsonify({'message': 'Current password is incorrect'}), 400
+                food_user.password_hash = bcrypt.generate_password_hash(data['newPassword']).decode('utf-8')
+
+            # Update other user attributes
+            if 'username' in data:
+                food_user.username = data['username']
+            if 'email' in data:
+                food_user.email = data['email']
+
+            db.session.commit()
+            return jsonify({'message': 'User updated successfully'}), 200
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'message': str(e)}), 400
         
 api.add_resource(FavoritesById, "/favorites/<int:id>")
 
@@ -372,29 +371,10 @@ def current_user():
         return jsonify(food_user.to_dict()), 200
     return jsonify(None), 401
 
-
-
-# @app.route('/users', methods=['POST'])
-# def login():
-#     data = request.get_json()
-#     email = data.get('email', None)
-#     password = data.get('password', None)
-
-    if not email or not password:
-        return jsonify({"msg": "Email and password are required"}), 400
-
-    user = User.query.filter_by(email=email).first()
-    if user and check_password_hash(user.password_hash, password):
-        # Identity can be any data that is json serializable
-        access_token = create_access_token(identity=user.id)
-        return jsonify(access_token=access_token), 200
-    else:
-        return jsonify({"msg": "Bad username or password"}), 401
-
 # Error handler
-@app.errorhandler(NotFound)
+@app.errorhandler(404)
 def handle_404(error):
-    return {'message': error.description}, 404
+    return {'message': str(error)}, 404
 
 
 if __name__ == '__main__':
