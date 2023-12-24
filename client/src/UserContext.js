@@ -30,16 +30,15 @@ export const UserProvider = ({ children }) => {
     setCurrentUser(newUser);
   };
 
-  const logout = () => {
-    return fetch("/logout", {
+  const logout = async () => {
+    const response = await fetch("/logout", {
       method: "DELETE", // Change to DELETE if that's what the server expects
       credentials: "include",
-    }).then((response) => {
-      if (!response.ok) {
-        throw new Error("Logout failed");
-      }
-      setCurrentUser(null);
     });
+    if (!response.ok) {
+      throw new Error("Logout failed");
+    }
+    setCurrentUser(null);
   };
   const login = (userData) => {
     setCurrentUser(userData); // Update state with the user data

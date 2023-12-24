@@ -1,15 +1,14 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { useSnackbar } from "notistack";
-import { UserContext } from "../UserContext"; // Ensure this path is correct
-import { Link } from "react-router-dom";
+import { UserContext } from "../UserContext";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
 
 const RestaurantDetails = () => {
-  const { currentUser, updateUser } = useContext(UserContext);
-  const [newReviewContent, setNewReviewContent] = useState("");
-  const [newReviewRating, setNewReviewRating] = useState("");
+  const { currentUser } = useContext(UserContext);
   const { id } = useParams();
-  const [editingReview, setEditingReview] = useState(null); // For tracking the review being edited
+  const [editingReview, setEditingReview] = useState(null);
   const [restaurant, setRestaurant] = useState({
     name: "",
     image_url: "",
@@ -20,6 +19,7 @@ const RestaurantDetails = () => {
     favorited_by: [],
     food_users: [],
   });
+  const [showReviewForm, setShowReviewForm] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
@@ -31,6 +31,10 @@ const RestaurantDetails = () => {
       .then((resp) => resp.json())
       .then((restaurantObj) => {
         setRestaurant(restaurantObj);
+        const userReview = restaurantObj.reviews.find(
+          (review) => review.food_user_id === currentUser?.id
+        );
+        setEditingReview(userReview || null);
       })
       .catch((error) => {
         enqueueSnackbar(`Error: ${error.message}`, { variant: "error" });
@@ -52,23 +56,21 @@ const RestaurantDetails = () => {
     })
       .then((response) => response.json())
       .then(() => {
-        fetchRestaurantDetails(); // Refetch restaurant details
+        fetchRestaurantDetails();
         enqueueSnackbar("Favorite added successfully!", { variant: "success" });
       })
       .catch((error) => {
-        console.error("Error saving favorite", error);
         enqueueSnackbar(error.message, { variant: "error" });
       });
   };
 
   const handleDeleteFavorite = () => {
-    // Assuming favoriteId is available or retrieved somehow
     fetch(`/favorites/${id}`, {
       method: "DELETE",
     })
       .then((response) => response.json())
       .then(() => {
-        fetchRestaurantDetails(); // Refetch restaurant details
+        fetchRestaurantDetails();
         enqueueSnackbar("Favorite removed successfully!", {
           variant: "success",
         });
@@ -80,15 +82,16 @@ const RestaurantDetails = () => {
 
   const handleEditReview = (review) => {
     setEditingReview(review);
-    setNewReviewContent(review.content);
-    setNewReviewRating(review.rating);
+    setShowReviewForm(true);
   };
 
   const handleDeleteReview = (reviewId) => {
     fetch(`/reviews/${reviewId}`, { method: "DELETE" })
       .then((response) => {
         if (!response.ok) throw new Error("Failed to delete review");
-        fetchRestaurantDetails(); // Refetch restaurant details
+        setEditingReview(null);
+        setShowReviewForm(false);
+        fetchRestaurantDetails();
         enqueueSnackbar("Review deleted successfully!", {
           variant: "success",
         });
@@ -98,8 +101,12 @@ const RestaurantDetails = () => {
       });
   };
 
-  const handleAddOrEditReview = (event) => {
-    event.preventDefault();
+  const reviewSchema = Yup.object().shape({
+    content: Yup.string().required("Content is required"),
+    rating: Yup.number().min(0).max(5).required("Rating is required"),
+  });
+
+  const handleAddOrEditReview = (values, { setSubmitting }) => {
     if (!currentUser) {
       enqueueSnackbar("You must be logged in to add or edit a review.", {
         variant: "error",
@@ -107,9 +114,21 @@ const RestaurantDetails = () => {
       return;
     }
 
+    if (
+      !editingReview &&
+      restaurant.reviews.some(
+        (review) => review.food_user_id === currentUser.id
+      )
+    ) {
+      enqueueSnackbar(
+        "You have already submitted a review for this restaurant.",
+        { variant: "error" }
+      );
+      return;
+    }
+
     const reviewData = {
-      content: newReviewContent,
-      rating: parseFloat(newReviewRating),
+      ...values,
       restaurant_id: id,
       food_user_id: currentUser.id,
     };
@@ -125,21 +144,20 @@ const RestaurantDetails = () => {
       body: JSON.stringify(reviewData),
     })
       .then((response) => response.json())
-      .then((updatedOrAddedReview) => {
-        fetchRestaurantDetails(); // Refetch restaurant details
+      .then(() => {
+        fetchRestaurantDetails();
         enqueueSnackbar(
           editingReview
             ? "Review updated successfully!"
             : "Review added successfully!",
           { variant: "success" }
         );
-        setNewReviewContent("");
-        setNewReviewRating("");
         setEditingReview(null);
       })
       .catch((error) => {
         enqueueSnackbar(error.message, { variant: "error" });
-      });
+      })
+      .finally(() => setSubmitting(false));
   };
 
   const reviewList = restaurant.reviews.map((review, index) => (
@@ -154,9 +172,16 @@ const RestaurantDetails = () => {
     </li>
   ));
 
-  const favoriteUserList = restaurant.favorited_by.map((username, index) => (
-    <li key={index}>{username}</li>
-  ));
+  const userHasReviewed = restaurant.reviews.some(
+    (review) => review.food_user_id === currentUser?.id
+  );
+
+  const isFavorite = restaurant.favorited_by.includes(currentUser?.username);
+
+  const toggleReviewForm = (review) => {
+    setShowReviewForm(!showReviewForm);
+    setEditingReview(review);
+  };
 
   return (
     <div className="one_restaurant">
@@ -167,36 +192,84 @@ const RestaurantDetails = () => {
           <p>Rating: {restaurant.rating}</p>
           <p>Phone Number: {restaurant.phone_number}</p>
           <Link to={`/view-menu/${id}`}>View Menu</Link>
-          <ul>{reviewList}</ul>
-          <form onSubmit={handleAddOrEditReview}>
-            <textarea
-              value={newReviewContent}
-              onChange={(e) => setNewReviewContent(e.target.value)}
-              placeholder="Write your review here"
-            />
-            <input
-              type="number"
-              value={newReviewRating}
-              onChange={(e) => setNewReviewRating(e.target.value)}
-              placeholder="Rating (0-5)"
-              min="0"
-              max="5"
-            />
-            <button type="submit">
-              {editingReview ? "Update Review" : "Submit Review"}
-            </button>
-          </form>
-          {restaurant.favorited_by.includes(currentUser?.username) ? (
-            <button onClick={() => handleDeleteFavorite()}>
-              Remove Favorite
-            </button>
-          ) : (
-            <button onClick={handleSaveFavorite}>Add to Favorites</button>
+          {restaurant.reviews.map((review, index) => (
+            <div key={index}>
+              {review.content} - {review.rating} stars
+              {currentUser && currentUser.id === review.food_user_id && (
+                <>
+                  <button onClick={() => handleEditReview(review)}>Edit</button>
+                  <button onClick={() => handleDeleteReview(review.id)}>
+                    Delete
+                  </button>
+                </>
+              )}
+            </div>
+          ))}
+          {currentUser && (
+            <>
+              {isFavorite && !showReviewForm && (
+                <button onClick={handleDeleteFavorite}>Remove Favorite</button>
+              )}
+              {!userHasReviewed && !showReviewForm && (
+                <button onClick={() => setShowReviewForm(true)}>
+                  Review Restaurant
+                </button>
+              )}
+              {userHasReviewed && !showReviewForm && (
+                <button onClick={() => setShowReviewForm(true)}>
+                  Edit Review
+                </button>
+              )}
+            </>
+          )}
+          {showReviewForm && (
+            <Formik
+              initialValues={{
+                content: editingReview?.content || "",
+                rating: editingReview?.rating || "",
+              }}
+              validationSchema={reviewSchema}
+              onSubmit={(values, actions) => {
+                handleAddOrEditReview(values, actions);
+                setShowReviewForm(false); // Hide the form after submission
+              }}
+              enableReinitialize>
+              {({ isSubmitting }) => (
+                <Form>
+                  <Field
+                    name="content"
+                    as="textarea"
+                    placeholder="Write your review here"
+                  />
+                  <ErrorMessage name="content" component="div" />
+                  <Field
+                    name="rating"
+                    type="number"
+                    placeholder="Rating (0-5)"
+                    min="0"
+                    max="5"
+                  />
+                  <ErrorMessage name="rating" component="div" />
+                  <button type="submit" disabled={isSubmitting}>
+                    {editingReview ? "Update Review" : "Submit Review"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowReviewForm(false)}>
+                    Cancel
+                  </button>
+                </Form>
+              )}
+            </Formik>
           )}
         </main>
         <aside>
           <h3>Users who favorited this restaurant:</h3>
-          <ul>{favoriteUserList}</ul>
+          <ul>
+            {restaurant.favorited_by.map((username, index) => (
+              <li key={index}>{username}</li>
+            ))}
+          </ul>
         </aside>
       </div>
     </div>
