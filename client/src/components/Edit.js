@@ -19,26 +19,27 @@ const EditProfile = () => {
       8,
       "Current password must be at least 8 characters long"
     ),
-    newPassword: Yup.string()
-      .min(8, "New password must be at least 8 characters long")
-      .when("currentPassword", {
-        is: (currentPassword) =>
-          Boolean(currentPassword && currentPassword.length > 0),
-        then: Yup.string().required(
-          "You must enter a new password if changing the current one."
-        ),
-      }),
-    confirmPassword: Yup.string()
-      .oneOf([Yup.ref("newPassword"), null], "Passwords must match")
-      .when("newPassword", {
-        is: (newPassword) => Boolean(newPassword && newPassword.length > 0),
-        then: Yup.string().required("You must confirm the new password."),
-      }),
+    newPassword: Yup.string().min(
+      8,
+      "New password must be at least 8 characters long"
+    ),
+    confirmPassword: Yup.string().test(
+      "password-match",
+      "Passwords must match",
+      function (value) {
+        if (this.parent.newPassword) {
+          return this.parent.newPassword === value;
+        }
+        return true;
+      }
+    ),
   });
 
   const handleFormSubmit = (values, { setSubmitting, resetForm }) => {
-    // Only send password fields if they are filled and not the same as the current password
-    if (values.newPassword && values.currentPassword === values.newPassword) {
+    if (
+      values.currentPassword &&
+      values.currentPassword === values.newPassword
+    ) {
       enqueueSnackbar(
         "New password must be different from the current password.",
         { variant: "error" }
