@@ -172,16 +172,18 @@ const RestaurantDetails = () => {
     </li>
   ));
 
-  const userHasReviewed = restaurant.reviews.some(
-    (review) => review.food_user_id === currentUser?.id
-  );
+  const toggleReviewForm = () => {
+    if (
+      editingReview ||
+      !restaurant.reviews.some(
+        (review) => review.food_user_id === currentUser?.id
+      )
+    ) {
+      setShowReviewForm(!showReviewForm);
+    }
+  };
 
   const isFavorite = restaurant.favorited_by.includes(currentUser?.username);
-
-  const toggleReviewForm = (review) => {
-    setShowReviewForm(!showReviewForm);
-    setEditingReview(review);
-  };
 
   return (
     <div className="one_restaurant">
@@ -192,36 +194,33 @@ const RestaurantDetails = () => {
           <p>Rating: {restaurant.rating}</p>
           <p>Phone Number: {restaurant.phone_number}</p>
           <Link to={`/view-menu/${id}`}>View Menu</Link>
-          {restaurant.reviews.map((review, index) => (
-            <div key={index}>
-              {review.content} - {review.rating} stars
-              {currentUser && currentUser.id === review.food_user_id && (
-                <>
-                  <button onClick={() => handleEditReview(review)}>Edit</button>
-                  <button onClick={() => handleDeleteReview(review.id)}>
-                    Delete
-                  </button>
-                </>
-              )}
-            </div>
-          ))}
+
+          <ul>{reviewList}</ul>
+
           {currentUser && (
             <>
-              {isFavorite && !showReviewForm && (
+              {isFavorite ? (
                 <button onClick={handleDeleteFavorite}>Remove Favorite</button>
+              ) : (
+                <button onClick={handleSaveFavorite}>Add to Favorites</button>
               )}
-              {!userHasReviewed && !showReviewForm && (
-                <button onClick={() => setShowReviewForm(true)}>
-                  Review Restaurant
+
+              {restaurant.reviews.some(
+                (review) => review.food_user_id === currentUser.id
+              ) ? (
+                <button onClick={() => setShowReviewForm(!showReviewForm)}>
+                  {showReviewForm ? "Cancel" : "Edit Review"}
                 </button>
-              )}
-              {userHasReviewed && !showReviewForm && (
-                <button onClick={() => setShowReviewForm(true)}>
-                  Edit Review
-                </button>
+              ) : (
+                !showReviewForm && (
+                  <button onClick={() => setShowReviewForm(true)}>
+                    Review Restaurant
+                  </button>
+                )
               )}
             </>
           )}
+
           {showReviewForm && (
             <Formik
               initialValues={{
@@ -231,7 +230,7 @@ const RestaurantDetails = () => {
               validationSchema={reviewSchema}
               onSubmit={(values, actions) => {
                 handleAddOrEditReview(values, actions);
-                setShowReviewForm(false); // Hide the form after submission
+                setShowReviewForm(false);
               }}
               enableReinitialize>
               {({ isSubmitting }) => (
@@ -253,11 +252,6 @@ const RestaurantDetails = () => {
                   <button type="submit" disabled={isSubmitting}>
                     {editingReview ? "Update Review" : "Submit Review"}
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => setShowReviewForm(false)}>
-                    Cancel
-                  </button>
                 </Form>
               )}
             </Formik>
@@ -275,5 +269,4 @@ const RestaurantDetails = () => {
     </div>
   );
 };
-
 export default RestaurantDetails;
