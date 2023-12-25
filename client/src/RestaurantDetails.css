@@ -1,0 +1,73 @@
+.one_restaurant {
+  background: var(--light-purp);
+  padding: 2rem;
+  border-radius: 15px;
+  margin: 2rem auto;
+  max-width: 900px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.one_restaurant h2 {
+  color: var(--main-txt-color);
+  margin-bottom: 1rem;
+}
+
+.one_restaurant img {
+  max-width: 100%;
+  border-radius: 10px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.one_restaurant .container {
+  display: flex;
+  flex-direction: column;
+}
+
+.one_restaurant main.restaurant_details {
+  background: rgba(255, 255, 255, 0.9);
+  padding: 1rem;
+  border-radius: 10px;
+}
+
+.one_restaurant main.restaurant_details a {
+  display: inline-block;
+  background-color: var(--med1-purp);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  margin-top: 1rem;
+  text-decoration: none;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s;
+}
+
+.one_restaurant main.restaurant_details a:hover {
+  background-color: var(--med2-purp);
+}
+
+.one_restaurant aside {
+  background: rgba(255, 255, 255, 0.9);
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 10px;
+}
+
+.one_restaurant ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.one_restaurant ul li {
+  background: var(--light-purp);
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 5px;
+}
+
+.one_restaurant ul li:not(:last-child) {
+  border-bottom: 1px solid var(--med2-purp);
+}
+
+.one_restaurant button {
+  margin-top: 1rem;
+}
