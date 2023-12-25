@@ -11,18 +11,54 @@
   --med2-purp: #1d3235;
   --dark-purp: #a08dca;
 
-  /* background: url(https://images.unsplash.com/photo-1675765765869-dcf7da360fd1?q=80&w=3472&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)
-    fixed no-repeat; */
-  background-size: cover;
   --main-txt-color: #b6af33;
 
   color: var(--main-txt-color);
+}
+
+body {
+  background: url("https://i.postimg.cc/Y90wWZ1m/black-wooden-textured-background-design.jpg")
+    fixed no-repeat;
+  background-size: cover;
 }
 
 #outlet {
   padding: 2rem 4rem;
   display: flex;
   justify-content: center;
+}
+
+.search-container {
+  display: flex;
+  justify-content: center; /* Center the search bar */
+  margin: 1rem 0; /* Add margin around the search container */
+  padding: 0.5rem;
+  max-width: 600px; /* Maximum width of the search bar */
+  border-radius: 25px; /* Rounded corners for the container */
+  background: rgba(255, 255, 255, 0.8); /* Semi-transparent white background */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Soft shadow for depth */
+}
+
+/* Search Bar Style */
+.search-bar {
+  width: 100%; /* Full width of its container */
+  border: none; /* No border for the input field */
+  outline: none; /* Removes the default focus outline */
+  padding: 0.75rem 1rem; /* Padding for the input */
+  border-radius: 20px; /* Rounded corners */
+  font-size: 1rem; /* Font size */
+  color: var(--med2-purp); /* Text color from the root variables */
+  background-color: transparent; /* Transparent background */
+  transition: box-shadow 0.3s ease; /* Smooth transition for shadow */
+}
+
+.search-bar::placeholder {
+  color: var(--med1-purp);
+  font-style: italic;
+}
+
+.search-bar:focus {
+  box-shadow: 0 0 0 2px var(--light-purp); /* Focus highlight */
 }
 
 #header {
@@ -32,42 +68,70 @@
   color: rgb(255, 252, 82);
   display: flex;
   justify-content: space-between;
-  padding: 10px 20px;
-  height: 200px;
+  align-items: center; /* Align items vertically */
+  padding: 10px 20px; /* Reduced padding for a sleeker look */
+  height: fit-content; /* Height adjusts to content */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  position: fixed;
+  top: -91px; /* Adjust this value based on the actual height of your header */
+  left: 0;
+  width: 100%;
+  transition: top 0.3s;
+  z-index: 1000; /* Make sure this is above other content */
+  background-color: #b2ab46;
+  border-radius: 0 0 10px 10px; /* Rounded bottom corners for the header */
+
+  /* align-items: center; */
 }
 
-#header .logo {
-  width: 350px; /* adjust as needed */
-  height: 200px;
+#header:hover,
+#header:focus {
+  top: 0;
+}
+
+/* You may want to add a gradient or a shadow to the bottom of the header */
+#header::after {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  width: 100%;
+  height: 10px;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), transparent);
 }
 
 /* Navigation Menu */
 #header nav {
   display: flex;
-  align-items: flex-start;
 }
 
 #header nav a {
   color: rgb(252, 246, 45);
   text-decoration: none;
-  padding: 20px 20px;
+  /* padding: 20px 20px; */
   transition: background 0.3s ease;
   margin-inline-start: auto;
   min-width: fit-content;
 }
 
 #header nav a:hover {
-  background-color: #555;
+  background-color: #ccbe57;
 }
 
 .logo {
   background: transparent !important;
   width: 400px;
-  height: 120px; /* Set a fixed height for your logo */
+  height: 110px; /* Set a fixed height for your logo */
   display: grid;
-  padding-top: 1%;
+  padding-top: 0%;
   margin-right: 100px; /* Add some margin to the right */
   margin-left: 650px;
+}
+
+.header-btn-active {
+  background-color: var(
+    --light-purp
+  ); /* Different background for active state */
 }
 
 a {
@@ -103,23 +167,32 @@ ul {
 }
 
 button,
-form input[type="submit"] {
-  padding: 0.5rem 2.5rem;
-  border: 2px solid var(--light-purp);
+.header-btn,
+.button-link,
+input[type="submit"],
+input[type="button"] {
+  padding: 10px 20px;
+  background-color: var(--med1-purp);
+  color: rgb(255, 252, 82);
   text-decoration: none;
-  background-color: rgba(213, 175, 175, 0);
-  color: var(--main-txt-color);
-  font-size: 1.25rem;
-  margin: 0 2rem;
-  display: inline;
-  float: right;
+  border: none;
+  border-radius: 100px;
+  margin: 0 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: large;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif; /* Ensures buttons inherit font from body */
 }
 
 button:hover,
-form input[type="submit"]:hover {
-  cursor: pointer;
-  color: var(--light-purp);
-  background-color: rgba(255, 255, 255, 0.1);
+.header-btn:hover,
+.button-link:hover,
+input[type="submit"]:hover,
+input[type="button"]:hover {
+  background-color: #b2ab46;
 }
 
 #banner {
@@ -140,23 +213,31 @@ form input[type="submit"]:hover {
 .card {
   width: 475px;
   height: 350px;
+  padding: 0;
   position: relative;
-  box-shadow: 15px 10px 10px rgba(0, 0, 0, 0.2); /* Add shadow for depth */
+  box-shadow: 20px 15px 15px rgba(0, 0, 0, 0.2);
+  border-radius: 30px; /* Rounder edges */
+  border: none; /* Ensure no border */
+  overflow: hidden; /* Ensures inner elements follow the card's border-radius */
 }
 
 .card img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: 30px; /* Rounder edges for the image to match the card */
 }
 
 .details {
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(237, 237, 68, 0.7);
   padding: 1rem;
   position: absolute;
   right: 0;
   bottom: 0;
   z-index: 1;
+  border-bottom-right-radius: 30px; /* Rounded bottom right corner */
+  border-bottom-left-radius: 0px; /* Rounded bottom left corner */
+  border-top-left-radius: 30px;
 }
 
 .details .hidden {
@@ -164,6 +245,7 @@ form input[type="submit"]:hover {
   overflow: hidden;
   transition: max-height 2s;
   will-change: max-height;
+  border-radius: 30px; /* Optionally round the hidden details if they are visible */
 }
 
 .card:hover .hidden {
@@ -196,14 +278,6 @@ aside {
   padding: 2rem;
   min-width: 400px;
   max-width: 80%;
-}
-
-.buttons {
-  display: flex;
-  gap: 2rem;
-  flex-wrap: wrap;
-  padding: 2rem;
-  justify-content: flex-end;
 }
 
 label,

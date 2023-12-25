@@ -1,15 +1,15 @@
 import React, { useContext } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
-import { UserContext } from "../UserContext"; // Adjust the import path as needed
+import { UserContext } from "../UserContext";
 
 const Header = () => {
-  const { currentUser, logout } = useContext(UserContext); // Destructure logout from context
+  const { currentUser, logout } = useContext(UserContext);
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
 
   const handleLogout = () => {
-    logout() // Call the logout function from the context
+    logout()
       .then(() => {
         navigate("/");
         enqueueSnackbar("Logged out successfully", { variant: "success" });
@@ -25,15 +25,25 @@ const Header = () => {
         <img src="/logo12.png" className="logo" alt="Kimchi-Compass Logo" />
       </NavLink>
       <nav>
-        <Link to="/restaurants">Restaurants</Link>
+        <NavLink to="/restaurants" className="header-btn">
+          Restaurants
+        </NavLink>
         {currentUser ? (
           <>
-            <Link to={`/profile/${currentUser.id}`}>Profile</Link>
-            <Link to="/add-restaurant">Add Restaurant</Link>
-            <button onClick={handleLogout}>Logout</button>
+            <NavLink to={`/profile/${currentUser.id}`} className="header-btn">
+              Profile
+            </NavLink>
+            <NavLink to="/add-restaurant" className="header-btn">
+              Add Restaurant
+            </NavLink>
+            <button onClick={handleLogout} className="header-btn">
+              Logout
+            </button>
           </>
         ) : (
-          <Link to={"/register"}>Login</Link>
+          <NavLink to={"/register"} className="header-btn">
+            Login
+          </NavLink>
         )}
       </nav>
     </div>

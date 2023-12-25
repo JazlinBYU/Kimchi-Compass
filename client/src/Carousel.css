@@ -1,0 +1,67 @@
+/* Carousel.css */
+
+.carousel-item {
+  height: 100vh; /* Adjust the height of the carousel */
+  position: relative;
+}
+
+.carousel-item img {
+  object-fit: cover; /* Ensure images cover the carousel area */
+  object-position: center; /* Center images */
+  height: 100%;
+  width: 100%;
+}
+
+.carousel-caption {
+  position: absolute;
+  bottom: 10%; /* Position the caption at the bottom */
+  right: 15%; /* Give some spacing from the sides */
+  left: 15%;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.5); /* Semi-transparent overlay */
+  border-radius: 0.5rem;
+}
+
+.carousel-caption h3 {
+  font-size: 2rem; /* Large text for headings */
+  color: #fff;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Text shadow for better readability */
+}
+
+.carousel-caption p {
+  font-size: 1rem; /* Standard text size for the paragraph */
+  color: #ddd;
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+/* Adjust the control sizes */
+.carousel-control-next-icon,
+.carousel-control-prev-icon {
+  height: 50px;
+  width: 50px;
+}
+
+/* Style for carousel indicators */
+.carousel-indicators [data-bs-target] {
+  background-color: #fff;
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .carousel-caption {
+    right: 5%;
+    left: 5%;
+    bottom: 20%;
+  }
+
+  .carousel-caption h3 {
+    font-size: 1.5rem;
+  }
+
+  .carousel-caption p {
+    font-size: 0.9rem;
+  }
+}
