@@ -4,6 +4,7 @@ import { useSnackbar } from "notistack";
 import { UserContext } from "../UserContext";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
+import "../index.css"; // Adjust the path if your CSS file is in a different directory
 
 const RestaurantDetails = () => {
   const { currentUser } = useContext(UserContext);
