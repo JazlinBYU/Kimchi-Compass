@@ -2,7 +2,7 @@
 
 .carousel-item {
   height: 100vh; /* Adjust the height of the carousel */
-  position: relative;
+  position: flex;
 }
 
 .carousel-item img {
@@ -14,7 +14,7 @@
 
 .carousel-caption {
   position: absolute;
-  bottom: 10%; /* Position the caption at the bottom */
+  bottom: 20%; /* Position the caption at the bottom */
   right: 15%; /* Give some spacing from the sides */
   left: 15%;
   padding: 1rem;

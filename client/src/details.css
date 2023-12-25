@@ -1,0 +1,29 @@
+.image-overlay {
+  position: fixed; /* Fixed position to cover the whole right side */
+  top: 0; /* Align to the top */
+  right: 0; /* Align to the right side */
+  bottom: 0; /* Stretch to the bottom */
+  left: 60%; /* Start from the middle of the screen */
+  /* overflow: hidden; Hide the overflow */
+}
+
+/* Adjust the image to fill the available space */
+.image-overlay img {
+  width: 110%; /* Auto width to maintain aspect ratio */
+  height: 100%; /* Full height */
+  object-fit: cover; /* Cover the space without stretching */
+}
+
+.search-bar-container {
+  position: relative;
+  z-index: 3; /* Higher than the restaurants-container to layer it over the image */
+  /* Additional styling for the search bar container */
+}
+
+/* Adjust z-index to ensure the content is on top */
+.restaurants-container {
+  position: relative;
+  z-index: 2; /* Higher than the image overlay */
+}
+
+/* Ensure the content takes the full left half of the screen */

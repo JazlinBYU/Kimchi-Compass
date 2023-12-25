@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import RestaurantCard from "./RestaurantCard";
 import SearchFilter from "./SearchFilter";
+import "../details.css";
 
 const Restaurants = () => {
   const [restaurants, setRestaurants] = useState([]);
@@ -50,17 +51,25 @@ const Restaurants = () => {
 
   return (
     <div className="restaurants-container">
-      <SearchFilter value={searchTerm} onChange={handleSearchChange} />
-      <div className="cards-container">
-        {isLoading ? (
-          <p>Loading restaurants...</p>
-        ) : filteredRestaurants.length > 0 ? (
-          filteredRestaurants.map((restaurant) => (
-            <RestaurantCard key={restaurant.id} restaurant={restaurant} />
-          ))
-        ) : (
-          <p>No restaurants found.</p>
-        )}
+      <div className="image-overlay">
+        <img src="/restaurant.jpg" alt="Restaurant Background" />
+      </div>
+      <div className="content-container">
+        {" "}
+        {/* This will contain all your content */}
+        <div className="search-bar-container"></div>
+        <SearchFilter value={searchTerm} onChange={handleSearchChange} />
+        <div className="cards-container">
+          {isLoading ? (
+            <p>Loading restaurants...</p>
+          ) : filteredRestaurants.length > 0 ? (
+            filteredRestaurants.map((restaurant) => (
+              <RestaurantCard key={restaurant.id} restaurant={restaurant} />
+            ))
+          ) : (
+            <p>No restaurants found.</p>
+          )}
+        </div>
       </div>
     </div>
   );

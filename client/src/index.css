@@ -2,24 +2,42 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: Palatino, "Cinzel", Times, serif;
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+}
+html,
+body {
+  margin: 0;
+  padding: 0;
+  /* other styles */
 }
 
 :root {
-  --light-purp: #c8bf96;
-  --med1-purp: #7d583f;
+  --light-purp: #ffffff;
+  --med1-purp: #ffffff;
   --med2-purp: #1d3235;
-  --dark-purp: #a08dca;
+  --dark-purp: #ffffff;
 
-  --main-txt-color: #b6af33;
+  --main-txt-color: #ffffff;
 
   color: var(--main-txt-color);
 }
 
 body {
-  background: url("https://i.postimg.cc/Y90wWZ1m/black-wooden-textured-background-design.jpg")
-    fixed no-repeat;
-  background-size: cover;
+  background: #000000;
+  margin: 0;
+  padding: 0;
+  background-size: contain;
+}
+
+.site-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.content-wrap {
+  flex: 1 0 auto; /* Flex-grow, flex-shrink, flex-basis */
+  min-height: calc(100vh);
 }
 
 #outlet {
@@ -30,20 +48,20 @@ body {
 
 /* Container for the entire Restaurants component */
 .restaurants-container {
-  max-width: 1700px;
-  max-height: 80%;
-  margin: auto;
-  padding: 6rem;
+  max-width: 1800px;
+  margin-left: 0; /* Align to the left side */
+  padding: 6rem 7rem 7rem 2rem; /* Top, Right, Bottom, Left padding */
 }
 
 /* Container for restaurant cards */
 .cards-container {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: flex-start; /* Align items to the start of the container */
   gap: 1rem;
   margin: 1rem 0;
-  max-height: 730px; /* Set a fixed height */
+  max-height: 680px; /* Set a fixed height */
+  max-width: 1000px;
   overflow-y: auto; /* Enable vertical scrolling */
   padding: 1rem;
   border-radius: 15px; /* Rounded corners for aesthetics */
@@ -52,9 +70,9 @@ body {
 /* Styling the search bar container */
 .search-container {
   display: block; /* Change to block to fill width */
-  max-width: 600px;
-  margin: 2rem auto;
-  padding: 0.5rem;
+  max-width: 400px;
+  margin: 2rem 0 2rem 2rem; /* Top, Right, Bottom, Left margin */
+  padding: 0.4rem;
   border-radius: 25px;
   background: rgba(255, 255, 255, 0.9);
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
@@ -63,13 +81,13 @@ body {
 /* Modernizing the search input */
 .search-bar {
   display: block; /* Change to block to fill width */
-  width: calc(100% - 2rem); /* Subtracting padding */
-  margin: 0 auto; /* Centering the input */
+  width: calc(100% - -0rem); /* Subtracting padding */
+  margin: auto; /* Centering the input */
   border: none;
-  padding: 0.75rem 1rem;
-  border-radius: 20px;
+  padding: 0.2rem 1rem;
+  border-radius: 50px;
   font-size: 1rem;
-  background-color: #fff;
+  background-color: #ffffff;
   transition: all 0.3s ease;
 }
 
@@ -81,32 +99,59 @@ body {
   box-shadow: 0 0 0 2px var(--light-purp);
 }
 
-#header {
-  background: url(https://images.unsplash.com/photo-1506968430777-bf7784a87f23?q=80&w=3542&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)
-    center no-repeat;
-  background-size: cover;
-  color: rgb(255, 252, 82);
+#footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background: transparent; /* Set the background to transparent */
   display: flex;
   justify-content: space-between;
-  align-items: center; /* Align items vertically */
-  padding: 10px 20px; /* Reduced padding for a sleeker look */
-  height: fit-content; /* Height adjusts to content */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
-  position: fixed;
-  top: -91px; /* Adjust this value based on the actual height of your header */
+  align-items: center;
+  padding: 0px 0px;
+  height: auto;
+
+  top: auto;
   left: 0;
   width: 100%;
-  transition: top 0.3s;
-  z-index: 1000; /* Make sure this is above other content */
-  background-color: #b2ab46;
-  border-radius: 0 0 10px 10px; /* Rounded bottom corners for the header */
+  z-index: 1000;
+}
+#footer,
+#footer a,
+#footer small {
+  color: #ffffff; /* This will set the text color to white */
+}
 
-  /* align-items: center; */
+/* If the links are not changing to white, increase specificity */
+#footer a {
+  color: #ffffff !important; /* This will force the text color to white */
+}
+
+/* If there are CDB components that need to change color */
+.CDBFooterLink,
+.CDBFooterLink * {
+  /* This targets all child elements as well */
+  color: #ffffff !important; /* This will force the text color to white */
+}
+
+#header {
+  background: transparent; /* Set the background to transparent */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  height: auto;
+
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
 }
 
 #header:hover,
 #header:focus {
-  top: 0;
+  background: transparent; /* Semi-transparent background on hover */
 }
 
 /* You may want to add a gradient or a shadow to the bottom of the header */
@@ -117,7 +162,7 @@ body {
   left: 0;
   width: 100%;
   height: 10px;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), transparent);
+  background: transparent;
 }
 
 /* Navigation Menu */
@@ -126,32 +171,33 @@ body {
 }
 
 #header nav a {
-  color: rgb(252, 246, 45);
+  background: transparent;
   text-decoration: none;
-  /* padding: 20px 20px; */
   transition: background 0.3s ease;
   margin-inline-start: auto;
   min-width: fit-content;
 }
 
 #header nav a:hover {
-  background-color: #ccbe57;
+  background: transparent;
 }
 
 .logo {
   background: transparent !important;
-  width: 400px;
+  color: rgb(255, 255, 255);
+  background-color: rgb(255, 255, 255);
+  border-color: white;
+  width: 250px;
   height: 110px; /* Set a fixed height for your logo */
   display: grid;
   padding-top: 0%;
   margin-right: 100px; /* Add some margin to the right */
-  margin-left: 650px;
+  margin-left: -0px;
+  filter: invert(100%) brightness(200%) contrast(200%);
 }
 
 .header-btn-active {
-  background-color: var(
-    --light-purp
-  ); /* Different background for active state */
+  background: transparent; /* Different background for active state */
 }
 
 a {
@@ -165,7 +211,7 @@ a:hover {
 }
 
 h2 {
-  font-family: "Nothing You Could Do", "Cinzel", "Brush Script MT", Palatino;
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
   margin: 1rem;
   font-size: 2.25rem;
 }
@@ -192,19 +238,19 @@ button,
 input[type="submit"],
 input[type="button"] {
   padding: 10px 20px;
-  background-color: var(--med1-purp);
-  color: rgb(255, 252, 82);
+  background: transparent;
+  color: #ffffff;
   text-decoration: none;
-  border: none;
+  border: #fff;
   border-radius: 100px;
   margin: 0 10px;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  font-size: large;
-  display: inline-flex;
+  font-size: 130%;
+  display: flex;
   align-items: center;
   justify-content: flex-start;
-  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif; /* Ensures buttons inherit font from body */
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif; /* Ensures buttons inherit font from body */
 }
 
 button:hover,
@@ -212,7 +258,7 @@ button:hover,
 .button-link:hover,
 input[type="submit"]:hover,
 input[type="button"]:hover {
-  background-color: #b2ab46;
+  background: transparent;
 }
 
 #banner {
@@ -232,10 +278,9 @@ input[type="button"]:hover {
 
 .card {
   width: 475px;
-  height: 350px;
+  height: 320px;
   padding: 0;
   position: relative;
-  box-shadow: 20px 15px 15px rgba(0, 0, 0, 0.2);
   border-radius: 30px; /* Rounder edges */
   border: none; /* Ensure no border */
   overflow: hidden; /* Ensures inner elements follow the card's border-radius */
@@ -249,15 +294,15 @@ input[type="button"]:hover {
 }
 
 .details {
-  background-color: rgba(237, 237, 68, 0.7);
-  padding: 1rem;
+  background-color: rgba(16, 16, 16, 0.7);
+  padding: 0rem;
   position: absolute;
   right: 0;
-  bottom: 0;
+  bottom: 1;
   z-index: 1;
   border-bottom-right-radius: 30px; /* Rounded bottom right corner */
-  border-bottom-left-radius: 0px; /* Rounded bottom left corner */
-  border-top-left-radius: 30px;
+  border-bottom-left-radius: 30px; /* Rounded bottom left corner */
+  border-top-left-radius: 0px;
 }
 
 .details .hidden {
@@ -269,7 +314,7 @@ input[type="button"]:hover {
 }
 
 .card:hover .hidden {
-  max-height: 200px;
+  max-height: 175px;
 }
 
 .one_restaurant {

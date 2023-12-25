@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Header from "./components/Header";
 import AppRoutes from "./components/routes"; // Import the routes file
+import Footer from "./components/Footer";
 
 const App = () => {
   const [user, setUser] = useState(null);
@@ -12,9 +13,13 @@ const App = () => {
   const ctx = { user, updateUser };
 
   return (
-    <div>
-      <Header user={user} updateUser={updateUser} />
-      <AppRoutes context={ctx} />
+    <div className="site-container">
+      <div className="content-wrap">
+        <Header user={user} updateUser={updateUser} />
+        <Footer user={user} updateUser={updateUser} />
+
+        <AppRoutes context={ctx} />
+      </div>
     </div>
   );
 };
