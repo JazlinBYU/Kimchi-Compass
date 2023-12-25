@@ -28,37 +28,57 @@ body {
   justify-content: center;
 }
 
-.search-container {
-  display: flex;
-  justify-content: center; /* Center the search bar */
-  margin: 1rem 0; /* Add margin around the search container */
-  padding: 0.5rem;
-  max-width: 600px; /* Maximum width of the search bar */
-  border-radius: 25px; /* Rounded corners for the container */
-  background: rgba(255, 255, 255, 0.8); /* Semi-transparent white background */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Soft shadow for depth */
+/* Container for the entire Restaurants component */
+.restaurants-container {
+  max-width: 1700px;
+  max-height: 80%;
+  margin: auto;
+  padding: 6rem;
 }
 
-/* Search Bar Style */
+/* Container for restaurant cards */
+.cards-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin: 1rem 0;
+  max-height: 730px; /* Set a fixed height */
+  overflow-y: auto; /* Enable vertical scrolling */
+  padding: 1rem;
+  border-radius: 15px; /* Rounded corners for aesthetics */
+  box-shadow: 0 4px 8px #ededed1a; /* Subtle shadow for depth */
+}
+/* Styling the search bar container */
+.search-container {
+  display: block; /* Change to block to fill width */
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 0.5rem;
+  border-radius: 25px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Modernizing the search input */
 .search-bar {
-  width: 100%; /* Full width of its container */
-  border: none; /* No border for the input field */
-  outline: none; /* Removes the default focus outline */
-  padding: 0.75rem 1rem; /* Padding for the input */
-  border-radius: 20px; /* Rounded corners */
-  font-size: 1rem; /* Font size */
-  color: var(--med2-purp); /* Text color from the root variables */
-  background-color: transparent; /* Transparent background */
-  transition: box-shadow 0.3s ease; /* Smooth transition for shadow */
+  display: block; /* Change to block to fill width */
+  width: calc(100% - 2rem); /* Subtracting padding */
+  margin: 0 auto; /* Centering the input */
+  border: none;
+  padding: 0.75rem 1rem;
+  border-radius: 20px;
+  font-size: 1rem;
+  background-color: #fff;
+  transition: all 0.3s ease;
 }
 
 .search-bar::placeholder {
-  color: var(--med1-purp);
-  font-style: italic;
+  color: var(--med2-purp);
 }
 
 .search-bar:focus {
-  box-shadow: 0 0 0 2px var(--light-purp); /* Focus highlight */
+  box-shadow: 0 0 0 2px var(--light-purp);
 }
 
 #header {

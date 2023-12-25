@@ -49,12 +49,9 @@ const Restaurants = () => {
   };
 
   return (
-    <div>
-      <div className="main"></div>
-      {alertMessage && <p className="alert">{alertMessage}</p>}{" "}
-      {/* Display alert messages */}
+    <div className="restaurants-container">
       <SearchFilter value={searchTerm} onChange={handleSearchChange} />
-      <div className="restaurant-list">
+      <div className="cards-container">
         {isLoading ? (
           <p>Loading restaurants...</p>
         ) : filteredRestaurants.length > 0 ? (
