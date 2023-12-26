@@ -1,11 +1,34 @@
+.form-page-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* This will make sure the container takes full viewport height */
+}
+
+.form-container {
+  width: 40%; /* Adjust the width of the form container */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.form-container img {
+  position: absolute;
+  left: 0;
+  width: 60%; /* Image takes up 60% of the screen width */
+  height: 100vh; /* Image takes up full viewport height */
+  object-fit: cover;
+  z-index: -1; /* Ensures the image stays in the background */
+}
+
+/* Adjust the form styling */
 .add-restaurant-form {
-  max-width: 600px;
-  margin: 2rem auto;
-  padding: 2rem;
   background: #f9f9f9;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin-top: 10%;
+  padding: 2rem;
+  margin-left: 85%; /* Align the form to the right */
+  margin-right: -30.5rem; /* Add some spacing from the right edge */
 }
 
 .add-restaurant-form label {
