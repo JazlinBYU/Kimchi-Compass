@@ -1,16 +1,48 @@
 import React from "react";
-import { Formik, Form, Field, ErrorMessage } from "formik";
+import { Formik, Form, Field, useField, ErrorMessage } from "formik"; // Added Field to the import
 import * as Yup from "yup";
 import { useSnackbar } from "notistack";
 import "../AddRestaurant.css";
 
 const formFields = [
   { name: "name", label: "Name", type: "text" },
-  { name: "rating", label: "Rating", type: "number" },
+  { name: "rating", label: "Rating", type: "number", min: "1", max: "5" }, // Added min and max
   { name: "image_url", label: "Image URL", type: "text" },
-  { name: "phone_number", label: "Phone Number", type: "text" },
+  { name: "phone_number", label: "Phone Number", type: "tel", pattern: "\\d*" }, // Changed type to "tel" and added pattern
   { name: "address", label: "Address", type: "text" },
 ];
+
+const RatingInput = ({ min, max, ...props }) => {
+  const [field, , helpers] = useField(props);
+  return (
+    <input
+      {...field}
+      {...props}
+      type="number"
+      min={min}
+      max={max}
+      onChange={(e) => {
+        const value = Math.max(min, Math.min(max, Number(e.target.value)));
+        helpers.setValue(value);
+      }}
+    />
+  );
+};
+
+const PhoneInput = ({ ...props }) => {
+  const [field, , helpers] = useField(props);
+  return (
+    <input
+      {...field}
+      {...props}
+      type="tel"
+      onChange={(e) => {
+        const value = e.target.value.replace(/\D/g, "");
+        helpers.setValue(value);
+      }}
+    />
+  );
+};
 
 const initialValues = formFields.reduce((values, field) => {
   values[field.name] = "";
@@ -19,7 +51,10 @@ const initialValues = formFields.reduce((values, field) => {
 
 const validationSchema = Yup.object({
   name: Yup.string().required("Name is required"),
-  rating: Yup.number().min(0).max(5).required("Rating is required"),
+  rating: Yup.number()
+    .min(1, "Rating must be 1 or higher")
+    .max(5, "Rating must be 5 or lower")
+    .required("Rating is required"),
   image_url: Yup.string().url("Invalid URL").required("Image URL is required"),
   phone_number: Yup.string()
     .matches(/^\d+$/, "Phone number must be numeric")
@@ -62,17 +97,26 @@ const AddRestaurantForm = () => {
           onSubmit={handleSubmit}>
           {({ isSubmitting }) => (
             <Form className="add-restaurant-form">
-              {formFields.map((field) => (
-                <div key={field.name}>
-                  <label htmlFor={field.name}>{field.label}:</label>
-                  <Field type={field.type} name={field.name} />
-                  <ErrorMessage
-                    name={field.name}
-                    component="div"
-                    className="error-message"
-                  />
-                </div>
-              ))}
+              {formFields.map((field) => {
+                // Determine the component to use based on the field name
+                let Component =
+                  field.type === "number"
+                    ? RatingInput
+                    : field.type === "tel"
+                    ? PhoneInput
+                    : "input";
+                return (
+                  <div key={field.name}>
+                    <label htmlFor={field.name}>{field.label}:</label>
+                    <Field as={Component} {...field} />
+                    <ErrorMessage
+                      name={field.name}
+                      component="div"
+                      className="error-message"
+                    />
+                  </div>
+                );
+              })}
               <button type="submit" disabled={isSubmitting}>
                 Add Restaurant
               </button>
