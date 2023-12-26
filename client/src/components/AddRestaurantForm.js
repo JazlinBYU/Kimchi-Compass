@@ -2,6 +2,7 @@ import React from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useSnackbar } from "notistack";
+import "../AddRestaurant.css";
 
 const formFields = [
   { name: "name", label: "Name", type: "text" },
@@ -52,25 +53,34 @@ const AddRestaurantForm = () => {
   };
 
   return (
-    <Formik
-      initialValues={initialValues}
-      validationSchema={validationSchema}
-      onSubmit={handleSubmit}>
-      {({ isSubmitting }) => (
-        <Form>
-          {formFields.map((field) => (
-            <div key={field.name}>
-              <label htmlFor={field.name}>{field.label}:</label>
-              <Field type={field.type} name={field.name} />
-              <ErrorMessage name={field.name} component="div" />
-            </div>
-          ))}
-          <button type="submit" disabled={isSubmitting}>
-            Add Restaurant
-          </button>
-        </Form>
-      )}
-    </Formik>
+    <div className="form-page-container">
+      <div className="form-container">
+        <img src="./addrest.jpg" alt="Right Side" />
+        <Formik
+          initialValues={initialValues}
+          validationSchema={validationSchema}
+          onSubmit={handleSubmit}>
+          {({ isSubmitting }) => (
+            <Form className="add-restaurant-form">
+              {formFields.map((field) => (
+                <div key={field.name}>
+                  <label htmlFor={field.name}>{field.label}:</label>
+                  <Field type={field.type} name={field.name} />
+                  <ErrorMessage
+                    name={field.name}
+                    component="div"
+                    className="error-message"
+                  />
+                </div>
+              ))}
+              <button type="submit" disabled={isSubmitting}>
+                Add Restaurant
+              </button>
+            </Form>
+          )}
+        </Formik>
+      </div>
+    </div>
   );
 };
 
