@@ -53,24 +53,22 @@ const UserProfile = () => {
   ));
 
   return (
-    <div>
+    <div className="profile-page">
       {currentUser && (
-        <>
-          <div className="main">
-            <h2>{userInfo.username}'s Profile</h2>
-            <p>Username: {userInfo.username}</p>
-            <p>Email: {userInfo.email}</p>
+        <div className="profile-card">
+          <h2>{userInfo.username}'s Profile</h2>
+          <p>Username: {userInfo.username}</p>
+          <p>Email: {userInfo.email}</p>
 
-            <div className="buttons">
-              <Link to="/profile/edit">
-                <button>Edit Profile</button>
-              </Link>
-              <button onClick={deleteProfile}>Delete Profile</button>
-            </div>
+          <div className="buttons">
+            <Link to="/profile/edit">
+              <button>Edit Profile</button>
+            </Link>
+            <button onClick={deleteProfile}>Delete Profile</button>
           </div>
-        </>
+        </div>
       )}
-      <div className="container">{favoriteRestaurants}</div>
+      <div className="favorites-container">{favoriteRestaurants}</div>
     </div>
   );
 };
