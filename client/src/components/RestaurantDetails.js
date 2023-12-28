@@ -211,81 +211,80 @@ const RestaurantDetails = () => {
 
   return (
     <div className="one_restaurant">
-      <h2>{restaurant.name}</h2>
-      <img src={restaurant.image_url} alt={restaurant.name} />
-      <div className="container">
-        <main className="restaurant_details">
+      <div className="image-container">
+        <img src={restaurant.image_url} alt={restaurant.name} />
+        <div className="image-details">
+          <h2>{restaurant.name}</h2>
           <p>Rating: {restaurant.rating}</p>
           <p>Phone Number: {restaurant.phone_number}</p>
           <Link to={`/view-menu/${id}`}>View Menu</Link>
-
-          <ul>{reviewList}</ul>
-
-          {currentUser && (
-            <>
-              {isFavorite ? (
-                <button onClick={handleDeleteFavorite}>Remove Favorite</button>
-              ) : (
-                <button onClick={handleSaveFavorite}>Add to Favorites</button>
-              )}
-
-              {!showReviewForm &&
-                !restaurant.reviews.some(
-                  (review) => review.food_user_id === currentUser.id
-                ) && (
-                  <button onClick={() => setShowReviewForm(true)}>
-                    Review Restaurant
-                  </button>
-                )}
-            </>
-          )}
-
-          {showReviewForm && (
-            <Formik
-              initialValues={{
-                content: editingReview?.content || "",
-                rating: editingReview?.rating || "",
-              }}
-              validationSchema={reviewSchema}
-              onSubmit={(values, actions) => {
-                handleAddOrEditReview(values, actions);
-                setShowReviewForm(false);
-              }}
-              enableReinitialize>
-              {({ isSubmitting }) => (
-                <Form>
-                  <Field
-                    name="content"
-                    as="textarea"
-                    placeholder="Write your review here"
-                  />
-                  <ErrorMessage name="content" component="div" />
-                  <Field
-                    name="rating"
-                    type="number"
-                    placeholder="Rating (1-5)"
-                    min="1"
-                    max="5"
-                  />
-                  <ErrorMessage name="rating" component="div" />
-                  <button type="submit" disabled={isSubmitting}>
-                    {editingReview ? "Update Review" : "Submit Review"}
-                  </button>
-                </Form>
-              )}
-            </Formik>
-          )}
-        </main>
-        <aside>
-          <h3>Users who favorited this restaurant:</h3>
-          <ul>
-            {restaurant.favorited_by.map((username, index) => (
-              <li key={index}>{username}</li>
-            ))}
-          </ul>
-        </aside>
+        </div>
       </div>
+
+      <div className="reviews-container">
+        {currentUser && (
+          <>
+            {isFavorite ? (
+              <button onClick={handleDeleteFavorite}>Remove Favorite</button>
+            ) : (
+              <button onClick={handleSaveFavorite}>Add to Favorites</button>
+            )}
+            {!showReviewForm &&
+              !restaurant.reviews.some(
+                (review) => review.food_user_id === currentUser.id
+              ) && (
+                <button onClick={() => setShowReviewForm(true)}>
+                  Review Restaurant
+                </button>
+              )}
+          </>
+        )}
+        {showReviewForm && (
+          <Formik
+            initialValues={{
+              content: editingReview?.content || "",
+              rating: editingReview?.rating || "",
+            }}
+            validationSchema={reviewSchema}
+            onSubmit={handleAddOrEditReview}
+            enableReinitialize>
+            {({ isSubmitting }) => (
+              <Form>
+                <Field
+                  name="content"
+                  as="textarea"
+                  placeholder="Write your review here"
+                />
+                <ErrorMessage name="content" component="div" />
+                <Field
+                  name="rating"
+                  type="number"
+                  placeholder="Rating (1-5)"
+                  min="1"
+                  max="5"
+                />
+                <ErrorMessage name="rating" component="div" />
+                <button type="submit" disabled={isSubmitting}>
+                  {editingReview ? "Update Review" : "Submit Review"}
+                </button>
+              </Form>
+            )}
+          </Formik>
+        )}
+        <ul>{reviewList}</ul>
+      </div>
+
+      <aside className="favorites-container">
+        <h3>Users who favorited this restaurant:</h3>
+        <ul>
+          {/* List of users who favorited */}
+          {restaurant.favorited_by.map((username, index) => (
+            <li key={index}>{username}</li>
+          ))}
+        </ul>
+      </aside>
     </div>
   );
 };
+
 export default RestaurantDetails;
