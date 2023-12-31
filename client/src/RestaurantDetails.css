@@ -6,6 +6,8 @@
 
 .one_restaurant .image-container {
   display: contents;
+  position: absolute;
+  left: 0%;
 }
 
 .one_restaurant .image-details {

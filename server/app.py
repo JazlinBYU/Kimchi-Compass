@@ -344,7 +344,7 @@ def google_login():
             db.session.add(food_user)
             db.session.commit()
         food_user=food_user.to_dict()
-        session['food_user_id'] = food_user
+        session['food_user_id'] = food_user['id']
         return make_response(food_user, 200)
     return make_response({"message":"this doesnt work"}, 200)
 
