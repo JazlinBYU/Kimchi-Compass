@@ -109,7 +109,6 @@ body {
   align-items: center;
   padding: 0px 0px;
   height: auto;
-
   top: auto;
   left: 0;
   width: 100%;
@@ -298,6 +297,7 @@ input[type="button"]:hover {
   border-bottom-right-radius: 0px;
   border-bottom-left-radius: 30px;
   border-top-left-radius: 0px;
+  color: #ffffff;
 }
 
 .details .hidden {
@@ -306,6 +306,14 @@ input[type="button"]:hover {
   transition: max-height 2s;
   will-change: max-height;
   border-radius: 30px;
+  color: #ffffff;
+}
+
+.card .details,
+.card .details button,
+.card .details h2,
+.card .details p {
+  color: #ffffff; /* This will set the text color to white */
 }
 
 .card:hover .hidden {
@@ -407,7 +415,7 @@ textarea {
 }
 
 * {
-  color: #413636; /* Optional: Adjust color for better contrast */
+  color: #ffffff; /* Optional: Adjust color for better contrast */
 }
 
 /* Styles for the signup container */

@@ -36,8 +36,8 @@ const ViewMenu = () => {
               <ul className="menu-list">
                 {menu.menu_dishes.map((menuDish) => (
                   <li key={menuDish.id} className="menu-item">
-                    <strong>{menuDish.dish.name}</strong> -{" "}
-                    {menuDish.dish.description} - ${menuDish.dish.price}
+                    {menuDish.dish.name} - {menuDish.dish.description} - $
+                    {menuDish.dish.price}
                   </li>
                 ))}
               </ul>

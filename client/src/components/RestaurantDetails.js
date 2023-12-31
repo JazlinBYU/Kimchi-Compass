@@ -213,9 +213,9 @@ const RestaurantDetails = () => {
         <img src={restaurant.image_url} alt={restaurant.name} />
         <div className="image-details">
           <h2>{restaurant.name}</h2>
+          <Link to={`/view-menu/${id}`}>View Menu</Link>
           <p>Rating: {restaurant.rating}</p>
           <p>Phone Number: {restaurant.phone_number}</p>
-          <Link to={`/view-menu/${id}`}>View Menu</Link>
         </div>
       </div>
 
