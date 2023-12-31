@@ -1,5 +1,5 @@
 import React from "react";
-import { CDBFooterLink, CDBBtn, CDBIcon, CDBContainer, CDBBox } from "cdbreact";
+import { CDBBtn, CDBIcon, CDBBox } from "cdbreact";
 import "../index.css";
 export const Footer = () => {
   return (

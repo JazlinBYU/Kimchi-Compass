@@ -410,9 +410,137 @@ label,
 button,
 input,
 textarea {
-  color: #ffffff; /* This sets the text color to white */
+  color: #000000; /* This sets the text color to white */
 }
 
 * {
   color: #ffffff; /* This sets the text color to white */
+}
+
+/* Styles for the signup container */
+.signup-container {
+  display: flex;
+  align-items: center; /* Center vertically */
+  height: 100vh;
+  background-color: #000000; /* Set the background color */
+}
+
+/* Styles for the image container */
+.sign-image {
+  flex: 0 0 60%; /* Assign 60% of the width to the image container */
+  height: 100vh; /* Set the height to the full viewport height */
+  background-image: url("https://i.ibb.co/sg4JmQD/bean-paste-soup-korean-style.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+  overflow: hidden; /* Clip the pseudo-element to the container's bounds */
+}
+
+/* background-attachment: fixed; */
+
+.sign-image::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: linear-gradient(
+    to left,
+    rgba(0, 0, 0, 1) 1%,
+    rgba(0, 0, 0, 0) 70%
+  );
+  pointer-events: none; /* Ensure the gradient doesn't interfere with user interaction */
+}
+/* Styles for the sign-up form container */
+.signup-box {
+  flex: 0 0 30%; /* Assign 40% of the width to the form container */
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center the form items horizontally */
+  background: #ffffff; /* Set the background color to white */
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: auto; /* Add scroll if content is too long */
+  position: absolute;
+  left: 68%;
+}
+
+/* Styles for the form title */
+.form-title {
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+/* Styles for the sign-up form */
+.signup-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.signup-form input {
+  padding: 10px;
+  margin-bottom: 1rem;
+  border-radius: 7px;
+  border: 1px solid #000000;
+  font-size: large;
+}
+
+/* Error message styling */
+.form-error {
+  color: #d9534f;
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+/* Submit button styling */
+.submit-btn {
+  padding: 10px;
+  background-color: #0056b3;
+  color: #ffffff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.2s;
+}
+
+.submit-btn:hover,
+.submit-btn:focus {
+  background-color: #004494;
+}
+
+/* Login options styling */
+.login-options {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.login-options .link {
+  color: #0056b3;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* Google button styling */
+.google-btn {
+  padding: 10px 20px;
+  background-color: #db4437;
+  color: #ffffff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  margin-top: 1rem;
+  transition: background-color 0.2s;
+  display: block; /* Change display to block for the margin auto to work */
+  margin: 1rem auto;
+}
+
+.google-btn:hover,
+.google-btn:focus {
+  background-color: #c1351d;
 }
