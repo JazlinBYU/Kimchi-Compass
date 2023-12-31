@@ -1,5 +1,5 @@
 import React from "react";
-import ReactDOM from "react-dom/client"; // Import from 'react-dom/client'
+import ReactDOM from "react-dom/client";
 import App from "./App";
 import { UserProvider } from "./UserContext";
 import { SnackbarProvider } from "notistack";
@@ -7,7 +7,6 @@ import { BrowserRouter } from "react-router-dom";
 import "./index.css";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
-// Use createRoot to render the application
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <GoogleOAuthProvider clientId="9656575814-i0rc5aehtlvhkv8fu23gnmgrtnspf5ps.apps.googleusercontent.com">

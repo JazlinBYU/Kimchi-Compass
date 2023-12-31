@@ -1,14 +1,14 @@
 import React from "react";
-import { Formik, Form, Field, useField, ErrorMessage } from "formik"; // Added Field to the import
+import { Formik, Form, Field, useField, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useSnackbar } from "notistack";
 import "../AddRestaurant.css";
 
 const formFields = [
   { name: "name", label: "Name", type: "text" },
-  { name: "rating", label: "Rating", type: "number", min: "1", max: "5" }, // Added min and max
+  { name: "rating", label: "Rating", type: "number", min: "1", max: "5" },
   { name: "image_url", label: "Image URL", type: "text" },
-  { name: "phone_number", label: "Phone Number", type: "tel", pattern: "\\d*" }, // Changed type to "tel" and added pattern
+  { name: "phone_number", label: "Phone Number", type: "tel", pattern: "\\d*" },
   { name: "address", label: "Address", type: "text" },
 ];
 
@@ -98,7 +98,6 @@ const AddRestaurantForm = () => {
           {({ isSubmitting }) => (
             <Form className="add-restaurant-form">
               {formFields.map((field) => {
-                // Determine the component to use based on the field name
                 let Component =
                   field.type === "number"
                     ? RatingInput

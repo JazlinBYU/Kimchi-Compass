@@ -1,17 +1,17 @@
-// ViewMenu.js
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import "../ViewMenu.css";
 
 const ViewMenu = () => {
-  const { id } = useParams(); // Restaurant ID from URL
+  const { id } = useParams();
   const [menus, setMenus] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`/menus?restaurant_id=${id}`) // Fetch menus for the specific restaurant
+    fetch(`/menus?restaurant_id=${id}`)
       .then((response) => response.json())
       .then((data) => {
-        setMenus(data); // Assuming the backend sends the filtered menus
+        setMenus(data);
         setIsLoading(false);
       })
       .catch((error) => {
@@ -21,25 +21,30 @@ const ViewMenu = () => {
   }, [id]);
 
   if (isLoading) {
-    return <div>Loading menus...</div>;
+    return <div className="menu-loading">Loading menus...</div>;
   }
 
   return (
-    <div>
-      <h2>Menu</h2>
-      {menus.map((menu) => (
-        <div key={menu.id}>
-          <h3>{menu.name}</h3>
-          <ul>
-            {menu.menu_dishes.map((menuDish) => (
-              <li key={menuDish.id}>
-                <strong>{menuDish.dish.name}</strong> -{" "}
-                {menuDish.dish.description} - ${menuDish.dish.price}
-              </li>
-            ))}
-          </ul>
+    <div className="view-menu-wrapper">
+      <div className="menu-image"></div>
+      <div className="menu-container">
+        <h1 className="menu-title"></h1>
+        <div className="menu-content">
+          {menus.map((menu) => (
+            <section key={menu.id} className="menu-section">
+              <h3 className="menu-section-title">{menu.name}</h3>
+              <ul className="menu-list">
+                {menu.menu_dishes.map((menuDish) => (
+                  <li key={menuDish.id} className="menu-item">
+                    <strong>{menuDish.dish.name}</strong> -{" "}
+                    {menuDish.dish.description} - ${menuDish.dish.price}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))}
         </div>
-      ))}
+      </div>
     </div>
   );
 };

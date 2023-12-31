@@ -56,7 +56,6 @@ const Restaurants = () => {
       </div>
       <div className="content-container">
         {" "}
-        {/* This will contain all your content */}
         <div className="search-bar-container"></div>
         <SearchFilter value={searchTerm} onChange={handleSearchChange} />
         <div className="cards-container">

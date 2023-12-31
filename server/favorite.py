@@ -20,15 +20,4 @@ class Favorite(db.Model, SerializerMixin):
 
     def __repr__(self):
         return f"<Favorite {self.id}>"
-    
-    # @validates("user_id")
-    # def validate_user_id(self, key, user_id):
-    #     if user_id <= 0:
-    #         raise ValueError("Invalid user ID")
-    #     return user_id
-
-    # @validates("restaurant_id")
-    # def validate_restaurant_id(self, key, restaurant_id):
-    #     if restaurant_id <= 0:
-    #         raise ValueError("Invalid restaurant ID")
-    #     return restaurant_id
+ 

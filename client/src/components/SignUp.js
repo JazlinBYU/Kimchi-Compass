@@ -54,21 +54,6 @@ const SignUp = () => {
     },
   });
 
-  // const loginWithGoogle = useGoogleLogin({
-  //   onSuccess: (codeResponse) => {
-  //     console.log(codeResponse);
-  //     fetch("/login/google", {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({ access_token: codeResponse.access_token }),
-  //     })
-  //       .then((resp) => resp.json())
-  //       .then((data) => {
-  //         console.log(data);
-  //       });
-  //   },
-  // });
-
   const handleSubmit = async (values, { setSubmitting }) => {
     const endpoint = isSignUp ? "/food_users" : "/login";
 
@@ -81,7 +66,6 @@ const SignUp = () => {
       .then((resp) => resp.json())
       .then((data) => {
         if (data.id) {
-          // Assuming 'id' is part of your user object when logged in
           updateUser(data); // Update the UserContext with new user information
           navigate(`/profile/${data.id}`);
           enqueueSnackbar(
@@ -99,11 +83,6 @@ const SignUp = () => {
       })
       .finally(() => setSubmitting(false));
   };
-
-  // const handleOAuthSignIn = (provider) => {
-  //   const oauthWindow = window.open(`/authorize/${provider}`, "_blank");
-  //   oauthWindow.focus();
-  // };
 
   return (
     <div className="signup-container">

@@ -2,11 +2,11 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh; /* This will make sure the container takes full viewport height */
+  height: 100vh;
 }
 
 .form-container {
-  width: 40%; /* Adjust the width of the form container */
+  width: 40%;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -15,10 +15,10 @@
 .form-container img {
   position: absolute;
   left: 0;
-  width: 60%; /* Image takes up 60% of the screen width */
-  height: 100vh; /* Image takes up full viewport height */
+  width: 60%;
+  height: 100vh;
   object-fit: cover;
-  z-index: -1; /* Ensures the image stays in the background */
+  z-index: -1;
 }
 
 /* Adjust the form styling */
@@ -27,23 +27,23 @@
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   padding: 2rem;
-  margin-left: 85%; /* Align the form to the right */
-  margin-right: -30.5rem; /* Add some spacing from the right edge */
-  margin-bottom: -8%; /* Add some spacing from the right edge */
+  margin-left: 85%;
+  margin-right: -30.5rem;
+  margin-bottom: -8%;
 
   flex-shrink: inherit;
-  padding-bottom: 2rem; /* extra padding to accommodate error messages */
-  max-height: 750px; /* Adjust to your preference */
-  overflow-y: auto; /* Enable scrolling */
+  padding-bottom: 2rem;
+  max-height: 750px;
+  overflow-y: auto;
 }
 
 .add-restaurant-form::-webkit-scrollbar {
-  width: 10px; /* Scrollbar width */
+  width: 10px;
   background: #ddd;
 }
 
 .add-restaurant-form::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.1); /* Scrollbar thumb color */
+  background: rgba(0, 0, 0, 0.1);
   border-radius: 10px;
 }
 
@@ -97,20 +97,19 @@
 .add-restaurant-form input,
 .add-restaurant-form select,
 .add-restaurant-form button {
-  color: #333; /* This will set the text color to a dark grey for better visibility */
+  color: #333;
 }
 
 .add-restaurant-form input,
 .add-restaurant-form select {
-  color: #000; /* This will ensure the text inside the inputs and selects is black */
-  /* ... other styles ... */
+  color: #000;
 }
 
 .add-restaurant-form input::placeholder {
-  color: #6c757d; /* This sets the placeholder text color to a standard grey */
+  color: #6c757d;
 }
 
 .error-message {
-  color: #dc3545; /* Bootstrap's default color for error messages */
-  font-size: 0.875em; /* smaller font size for error text */
+  color: #dc3545;
+  font-size: 0.875em;
 }

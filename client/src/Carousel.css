@@ -1,35 +1,33 @@
-/* Carousel.css */
-
 .carousel-item {
-  height: 100vh; /* Adjust the height of the carousel */
+  height: 100vh;
   position: flex;
 }
 
 .carousel-item img {
-  object-fit: cover; /* Ensure images cover the carousel area */
-  object-position: center; /* Center images */
+  object-fit: cover;
+  object-position: center;
   height: 100%;
   width: 100%;
 }
 
 .carousel-caption {
   position: absolute;
-  bottom: 20%; /* Position the caption at the bottom */
-  right: 15%; /* Give some spacing from the sides */
+  bottom: 20%;
+  right: 15%;
   left: 15%;
   padding: 1rem;
-  background: rgba(0, 0, 0, 0.5); /* Semi-transparent overlay */
+  background: rgba(0, 0, 0, 0.5);
   border-radius: 0.5rem;
 }
 
 .carousel-caption h3 {
-  font-size: 2rem; /* Large text for headings */
+  font-size: 2rem;
   color: #fff;
-  text-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Text shadow for better readability */
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
 .carousel-caption p {
-  font-size: 1rem; /* Standard text size for the paragraph */
+  font-size: 1rem;
   color: #ddd;
   text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
 }

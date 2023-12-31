@@ -4,7 +4,7 @@ import { useSnackbar } from "notistack";
 import { UserContext } from "../UserContext";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import "../RestaurantDetails.css"; // Adjust the path if your CSS file is in a different directory
+import "../RestaurantDetails.css";
 
 const RestaurantDetails = () => {
   const { currentUser } = useContext(UserContext);
@@ -180,7 +180,6 @@ const RestaurantDetails = () => {
         <>
           {isEdit && editingReview && editingReview.id === review.id ? (
             <>
-              {/* "Edit" has been clicked, "Delete" and "Cancel" are now shown */}
               <button onClick={() => handleDeleteReview(review.id)}>
                 Delete
               </button>
@@ -188,7 +187,6 @@ const RestaurantDetails = () => {
             </>
           ) : (
             <>
-              {/* Not in edit mode, show "Edit" button */}
               <button onClick={() => handleEditReview(review)}>Edit</button>
             </>
           )}

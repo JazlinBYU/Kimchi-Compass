@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Header from "./components/Header";
-import AppRoutes from "./components/routes"; // Import the routes file
+import AppRoutes from "./components/routes";
 import Footer from "./components/Footer";
 
 const App = () => {

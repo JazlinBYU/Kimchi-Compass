@@ -189,7 +189,6 @@ def seed_database():
         food_users = FoodUser.query.all()
         restaurants = Restaurant.query.all()
 
-# Let's assume each user favorites 2 restaurants
         for food_user in food_users:
             favorite_restaurants = sample(restaurants, 10)  # Select 2 random restaurants
             for restaurant in favorite_restaurants:

@@ -2,8 +2,8 @@
 from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy.orm import validates
 from config import db
-from food_user import FoodUser  # Import the User class
-from datetime import datetime  # Import datetime if you're adding a date field
+from food_user import FoodUser  
+from datetime import datetime  
 
 class Review(db.Model, SerializerMixin):
     __tablename__ = 'reviews'
@@ -20,14 +20,11 @@ class Review(db.Model, SerializerMixin):
     restaurant = db.relationship('Restaurant', back_populates='reviews')
 
     # Serialization
-    # Exclude the entire food_user and restaurant objects to prevent recursion
+  
     serialize_only = ("id", "content", "rating", "review_date", "food_user_id", "restaurant_id")
 
     def __repr__(self):
         return f"<Review {self.id}: {self.content}: {self.rating}>"
-
-    # Validation methods...
-
 
     # Validation
     @validates("content")
