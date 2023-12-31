@@ -4,7 +4,6 @@ import { UserContext } from "../UserContext";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useSnackbar } from "notistack";
-import "../index.css";
 
 const EditProfile = () => {
   const { currentUser, updateUser } = useContext(UserContext);
