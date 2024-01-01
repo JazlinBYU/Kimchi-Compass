@@ -21,15 +21,30 @@ export const Footer = () => {
           </small>
         </CDBBox>
         <CDBBox display="flex">
-          <CDBBtn flat color="dark" className="p-2">
-            <CDBIcon fab icon="facebook-f" />
-          </CDBBtn>
-          <CDBBtn flat color="dark" className="mx-3 p-2">
-            <CDBIcon fab icon="linkedin" />
-          </CDBBtn>
-          <CDBBtn flat color="dark" className="p-2">
-            <CDBIcon fab icon="github" />
-          </CDBBtn>
+          <a
+            href="https://www.instagram.com/yujazlin/"
+            target="_blank"
+            rel="noopener noreferrer">
+            <CDBBtn flat color="dark" className="p-2">
+              <CDBIcon fab icon="instagram" />
+            </CDBBtn>
+          </a>
+          <a
+            href="https://www.linkedin.com/in/jazzfunction/"
+            target="_blank"
+            rel="noopener noreferrer">
+            <CDBBtn flat color="dark" className="mx-3 p-2" src="">
+              <CDBIcon fab icon="linkedin" />
+            </CDBBtn>
+          </a>
+          <a
+            href="https://github.com/JazlinBYU"
+            target="_blank"
+            rel="noopener noreferrer">
+            <CDBBtn flat color="dark" className="p-2">
+              <CDBIcon fab icon="github" />
+            </CDBBtn>
+          </a>
         </CDBBox>
       </CDBBox>
     </div>
