@@ -15,8 +15,8 @@
   bottom: 20%;
   right: 15%;
   left: 15%;
-  padding: 1rem;
-  background: rgba(0, 0, 0, 0.5);
+  padding: 0.5rem;
+  background: rgba(21, 21, 21, 0.268);
   border-radius: 0.5rem;
 }
 
@@ -27,7 +27,7 @@
 }
 
 .carousel-caption p {
-  font-size: 1rem;
+  font-size: larger;
   color: #ddd;
   text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
 }

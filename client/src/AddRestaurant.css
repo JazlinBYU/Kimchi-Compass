@@ -21,6 +21,38 @@
   z-index: -1;
 }
 
+.form-container::before {
+  content: "";
+  display: block;
+  position: absolute;
+  right: -100%; /* Start the gradient to the left outside of the form */
+  top: 0;
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(
+    to left,
+    #000000,
+    /* Form background color */ transparent
+  );
+  z-index: -1; /* Behind the form */
+}
+
+/* Add a pseudo-element for the gradient */
+.form-page-container::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  left: 50%; /* Adjust this value to control the width of the gradient */
+  background: linear-gradient(
+    to left,
+    #000000 0%,
+    /* This should be the background color of the body */ transparent 100%
+  );
+  z-index: 1; /* Ensure it's above the image but below the form */
+}
+
 /* Adjust the form styling */
 .add-restaurant-form {
   background: #f9f9f9;
