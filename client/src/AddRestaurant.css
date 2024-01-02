@@ -1,15 +1,19 @@
 .form-page-container {
   display: flex;
-  justify-content: center;
+  justify-content: center; /* Center the form in the viewport */
   align-items: center;
   height: 100vh;
+  position: relative;
+  background-color: #000; /* Black background for the fade */
 }
 
 .form-container {
-  width: 40%;
-  display: flex;
-  flex-direction: column;
+  width: 60%;
+  display: contents;
   justify-content: center;
+  position: relative; /* This is needed for absolute positioning of children */
+  z-index: 2; /* Ensures form is above the image and gradient */
+  padding: 2rem; /* Padding inside the form */
 }
 
 .form-container img {
@@ -18,40 +22,30 @@
   width: 60%;
   height: 100vh;
   object-fit: cover;
-  z-index: -1;
+  z-index: 1; /* Ensures image is under the gradient */
 }
 
-.form-container::before {
+/* This new pseudo-element will cover the image and create the fade effect */
+.form-container::after {
   content: "";
   display: block;
   position: absolute;
-  right: -100%; /* Start the gradient to the left outside of the form */
+  right: 40%; /* Aligns with the form container */
   top: 0;
   bottom: 0;
   left: 0;
   background: linear-gradient(
-    to left,
-    #000000,
-    /* Form background color */ transparent
+    to right,
+    /* Gradient direction */ transparent,
+    /* Start transparent over the image */ #000000 100%
+      /* End with black where the form starts */
   );
-  z-index: -1; /* Behind the form */
+  z-index: 1; /* Above the image */
 }
-
-/* Add a pseudo-element for the gradient */
 .form-page-container::after {
-  content: "";
-  position: absolute;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  left: 50%; /* Adjust this value to control the width of the gradient */
-  background: linear-gradient(
-    to left,
-    #000000 0%,
-    /* This should be the background color of the body */ transparent 100%
-  );
-  z-index: 1; /* Ensure it's above the image but below the form */
+  content: none;
 }
+/* Add a pseudo-element for the gradient */
 
 /* Adjust the form styling */
 .add-restaurant-form {
@@ -59,22 +53,32 @@
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   padding: 2rem;
-  margin-left: 85%;
-  margin-right: -30.5rem;
-  margin-bottom: -8%;
-
+  margin-left: 39%;
+  margin-right: -20rem;
+  margin-bottom: -3%;
+  width: 35%;
   flex-shrink: inherit;
   padding-bottom: 2rem;
   max-height: 750px;
   overflow-y: auto;
 }
 
-.add-restaurant-form::-webkit-scrollbar {
+.form-scroll-container {
+  overflow-y: auto;
+  max-height: 750px; /* Adjust as needed */
+  margin-right: -20rem; /* Adjust if needed */
+  padding: 2rem; /* This will be the padding around the form */
+  border-radius: 8px; /* This maintains the rounded corner */
+  width: 100%; /* Make it fill the form-container */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional shadow */
+}
+
+.form-scroll-container::-webkit-scrollbar {
   width: 10px;
   background: #ddd;
 }
 
-.add-restaurant-form::-webkit-scrollbar-thumb {
+.form-scroll-container::-webkit-scrollbar-thumb {
   background: rgba(0, 0, 0, 0.1);
   border-radius: 10px;
 }
