@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../UserContext";
 import { Formik, Form, Field, ErrorMessage } from "formik";
@@ -9,7 +9,6 @@ const EditProfile = () => {
   const { currentUser, updateUser } = useContext(UserContext);
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
-  const [isUpdated, setIsUpdated] = useState(false);
 
   const validationSchema = Yup.object().shape({
     username: Yup.string()
@@ -17,11 +16,11 @@ const EditProfile = () => {
       .min(3, "Username must be at least 3 characters long"),
     email: Yup.string().email("Invalid email").required("Email is required"),
     currentPassword: Yup.string().min(
-      3,
+      8,
       "Current password must be at least 8 characters long"
     ),
     newPassword: Yup.string().min(
-      3,
+      8,
       "New password must be at least 8 characters long"
     ),
     confirmPassword: Yup.string().oneOf(
@@ -43,6 +42,12 @@ const EditProfile = () => {
       return;
     }
 
+    if (!currentUser) {
+      enqueueSnackbar("No user is currently logged in.", { variant: "error" });
+      setSubmitting(false);
+      return;
+    }
+
     const payload = {
       username: values.username,
       email: values.email,
@@ -50,7 +55,6 @@ const EditProfile = () => {
       newPassword: values.newPassword,
     };
 
-    // API call
     fetch(`/food_users/${currentUser.id}`, {
       method: "PATCH",
       headers: {
@@ -58,33 +62,24 @@ const EditProfile = () => {
       },
       body: JSON.stringify(payload),
     })
-      .then((response) => {
-        if (!response.ok) {
-          return response.json().then((data) => {
-            throw new Error(data.message);
-          });
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.message && data.message === "User updated successfully") {
+          enqueueSnackbar(data.message, { variant: "success" });
+          // Uncomment the updateUser line if the server sends back the updated user object
+          updateUser(data.user);
+          navigate("/register");
+        } else {
+          throw new Error("Unexpected response from the server");
         }
-        return response.json();
-      })
-      .then((UserContext) => {
-        updateUser(UserContext);
-        setIsUpdated(true); // Set the updated flag
-        enqueueSnackbar("Profile updated successfully!", {
-          variant: "success",
-        });
       })
       .catch((error) => {
         enqueueSnackbar(error.message, { variant: "error" });
       })
-      .finally(() => setSubmitting(false));
+      .finally(() => {
+        setSubmitting(false);
+      });
   };
-  useEffect(() => {
-    if (isUpdated) {
-      navigate(`/profile/${currentUser.id}`);
-    }
-  }, [isUpdated, currentUser, navigate]);
-
-  console.log(currentUser);
 
   return (
     <div className="edit-profile">
