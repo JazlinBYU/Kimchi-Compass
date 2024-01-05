@@ -10,7 +10,7 @@ Kimchi-Compass is a full-stack web application designed for Korean food enthusia
 - **Responsive UI**: A sleek and responsive design for an optimal user experience on any device.
 
 # GIF
-<img src="https://github.com/JazlinBYU/Kimchi-Compass/blob/main/kimchi.gif" width="250" height="250">
+<img src="https://github.com/JazlinBYU/Kimchi-Compass/blob/main/kimchi.gif">
 
 ## Tech Stack
 
