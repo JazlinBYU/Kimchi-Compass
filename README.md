@@ -31,37 +31,42 @@ Follow these instructions to get Kimchi-Compass up and running on your local mac
 
 #### Frontend
 
-```bash
 # Clone the repository
+
 git clone https://github.com/yourusername/Kimchi-Compass.git
 cd Kimchi-Compass/client
 
 # Install dependencies
+
 npm install
 
 # Start the React development server
-npm start
 
+npm start
 
 #### Backend
 
 # Navigate to the server directory
+
 cd server
 
 # Set up a Python virtual environment
+
 python -m venv venv
 source venv/bin/activate # Unix/Linux/MacOS
 venv\Scripts\activate # Windows
 
 # Install dependencies
+
 pip install -r requirements.txt
 
 # Run database migrations
+
 flask db upgrade
 
 # Start the Flask server
-flask run
 
+flask run
 
 Configuration
 Create a .env file in the server directory with the following format:
@@ -71,16 +76,14 @@ SECRET_KEY="your_secret_key"
 GOOGLE_CLIENT_ID="your_google_client_id"
 GOOGLE_CLIENT_SECRET="your_google_client_secret"
 
-
 Seeding the Database
 To seed the database with initial data:
 
 python seed.py
 
-
 Usage
 The application will be running on http://localhost:3000 for the frontend and http://localhost:5000 for the backend.
 
-
+```
 
 ```
