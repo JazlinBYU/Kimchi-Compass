@@ -34,6 +34,7 @@ Follow these instructions to get Kimchi-Compass up and running on your local mac
 # Clone the repository
 
 git clone https://github.com/JazlinBYU/Kimchi-Compass.git
+
 cd Kimchi-Compass/client
 
 # Install dependencies
