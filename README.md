@@ -33,7 +33,7 @@ Follow these instructions to get Kimchi-Compass up and running on your local mac
 
 # Clone the repository
 
-git clone https://github.com/yourusername/Kimchi-Compass.git
+git clone https://github.com/JazlinBYU/Kimchi-Compass?tab=readme-ov-file
 cd Kimchi-Compass/client
 
 # Install dependencies
