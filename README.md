@@ -69,7 +69,7 @@ flask db upgrade
 
 flask run
 
-### Configuration
+# Configuration
 
 Create a .env file in the server directory with the following format:
 
@@ -78,12 +78,12 @@ SECRET_KEY="your_secret_key"
 GOOGLE_CLIENT_ID="your_google_client_id"
 GOOGLE_CLIENT_SECRET="your_google_client_secret"
 
-### Seeding the Database
+# Seeding the Database
 
 To seed the database with initial data:
 
 python seed.py
 
-### Usage
+# Usage
 
 The application will be running on http://localhost:3000 for the frontend and http://localhost:5555 for the backend.
