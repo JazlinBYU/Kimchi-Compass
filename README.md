@@ -9,6 +9,9 @@ Kimchi-Compass is a full-stack web application designed for Korean food enthusia
 - **User Authentication**: Secure login functionality with Google OAuth 2.0.
 - **Responsive UI**: A sleek and responsive design for an optimal user experience on any device.
 
+# GIF
+![](https://github.com/JazlinBYU/Kimchi-Compass/blob/main/kimchi.gif)
+
 ## Tech Stack
 
 - **Frontend**: React, React Router
