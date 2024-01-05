@@ -73,7 +73,10 @@ const SignUp = () => {
             { variant: "success" }
           );
         } else {
-          enqueueSnackbar(data.message, { variant: "error" }); // Handle errors
+          const message = data.message.startsWith("(sqlite3.IntegrityError)")
+            ? "username already in use"
+            : data.message;
+          enqueueSnackbar(message, { variant: "error" }); // Handle errors
         }
       })
       .catch((err) => {

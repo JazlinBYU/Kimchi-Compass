@@ -70,7 +70,10 @@ const EditProfile = () => {
           updateUser(data.user);
           navigate("/register");
         } else {
-          throw new Error("Unexpected response from the server");
+          const message = data.message.startsWith("(sqlite3.IntegrityError)")
+            ? "username already in use"
+            : data.message;
+          enqueueSnackbar(message, { variant: "error" }); // Handle errors
         }
       })
       .catch((error) => {
