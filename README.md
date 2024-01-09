@@ -89,4 +89,4 @@ python seed.py
 
 # Usage
 
-The application will be running on http://localhost:3000 for the frontend and http://localhost:5555 for the backend.
+The application will be running on http://localhost:3000 for the frontend and http://localhost:5000 for the backend.
